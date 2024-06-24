@@ -63,7 +63,7 @@ class IssueListView(ListView):
 def index(request):
     context = {
         "currUser": request.user,
-        "title": "Issues Board",
+        "title": "1ssues Board",
         "filter_text": None,
         "sort_form": issueSortForm(),
     }

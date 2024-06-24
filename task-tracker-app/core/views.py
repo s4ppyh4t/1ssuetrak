@@ -19,13 +19,14 @@ def index(request):
     return render(
         request,
         "core/index.html",
-        {"currUser": request.user, "title": "Not a DjangoApp"},
+        {"currUser": request.user, "title": "1ssuetrak Home"},
     )
 
 
 def git_tab(request):
+    app_name = "1ssuetrak"
     data: Result[dict, str] = scrape_commits(
-        url="https://api.github.com/repos/s4ppyh4t/task-tracker-app/commits"
+        url=f"https://api.github.com/repos/s4ppyh4t/{app_name}/commits"
     )
     payload: list
     if data.is_ok():

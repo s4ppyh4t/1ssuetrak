@@ -13,7 +13,7 @@
     {% endfor %}
 {% endif %}
     {% if currUser.is_authenticated %}
-        Welcome to 1ssueTrck, {{ user.username }}
+        Welcome to 1ssueTrak, {{ user.username }}
     {% else %}
         <span class="text-warning">You are not logged in!</span> Some options will be disabled. 
         <p>Please <a href={% url "login" %}>log in</a> to use the application.</p>
