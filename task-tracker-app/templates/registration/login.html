@@ -1,0 +1,50 @@
+{% extends "core/base.html" %}
+{% block main %}
+
+    {% if form.errors %}
+        <div class="alert alert-warning d-flex flex-row" role="alert">
+            <div class="flex-grow-1">Your username and password didn't match. Please try again.</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    {% if next %}
+        <div class="alert alert-danger" role="alert">
+            {% if user.is_authenticated %}
+                <p>Your account doesn't have access to this page. To proceed,
+                    please login with an account that has access.</p>
+            {% else %}
+                <p>Please login to see this page.</p>
+            {% endif %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card" >
+                    <div class="card-header">
+                        <h3>Log in</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'login' %}" class="">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="id_username" class="form-label">Username</label>
+                                <input class="form-control" type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="id_username">
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_password" class="form-label">Password</label>
+                                <input class="form-control" type="password" name="password" autocomplete="current-password" required="" id="id_password">
+                            </div>
+                            <div class="d-grid gap-2"><button type="submit" class="btn btn-primary btn-block" value="login">Log In</button></div>
+                            <hr/>
+                            <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock main %}

@@ -1,0 +1,17 @@
+{% extends "core/base.html" %}
+{% block main %}
+
+  <p
+    class="text-success"
+    hx-get="{% url "core:index" %}"
+    hx-trigger="load delay:2s"
+    hx-select="main"
+    hx-swap="outerHTML"
+    hx-target="main"
+    hx-push-url="true"
+  >Logged out successfully!</p>
+  <p>You are being redirected to Home Page automatically. Click <a class="text-primary-emphasis" href="{% url "core:index" %}">here</a> if you're not redirected Home after 2 seconds.</p>
+  <span class="spinner-border spinner-border-sm" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </span>
+{% endblock %}

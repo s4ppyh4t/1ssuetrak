@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block nav_bar %}
+    {{ nav_bar }}
+{% endblock nav_bar %}
+{% block main %}
+{% if messages %}
+    {% for msg in messages %}
+        <div class="alert alert-{% if msg.tags == "error" %}danger{% else %}success{% endif %} d-flex flex-row" role="alert">
+            <div class="flex-grow-1">{{ msg }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+    {% if currUser.is_authenticated %}
+        Welcome to 1ssueTrck, {{ user.username }}
+    {% else %}
+        <span class="text-warning">You are not logged in!</span> Some options will be disabled. 
+        <p>Please <a href={% url "login" %}>log in</a> to use the application.</p>
+    {% endif %}
+
+{% endblock main %}
+{% block title %}{{ title }}{% endblock title %}

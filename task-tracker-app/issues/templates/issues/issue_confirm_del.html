@@ -1,0 +1,33 @@
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog  modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="confirmDeleteModalLabel">
+                    <em>
+                        Confim issue deletion
+                    </em>
+                </h1>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <form method="POST" action="{% url "issues:delete_issue" %}">
+                {% csrf_token %}
+                <div class="modal-body" id="confirmDeleteBody">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn btn btn-secondary" data-bs-dismiss="modal" style="width: 10px">
+                        Cancel
+                    </button>
+                    <button type="submit" id="confirmDeleteButton" class="modal-btn btn btn-danger" style="width: 10px">
+                        Confirm Delete
+                    </button>
+                </div>
+                <form>
+                </div>
+            </div>
+        </div>

@@ -1,0 +1,5 @@
+[virtualenvs]
+in-project = true
+
+[tool.poetry]
+package-mode = false

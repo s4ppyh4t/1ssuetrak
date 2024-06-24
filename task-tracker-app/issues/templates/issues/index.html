@@ -1,0 +1,95 @@
+{% extends "core/base.html" %}
+{% block extra_style %}
+    .modal-btn{
+    flex-grow:1;
+    cursor: pointer;
+    transition: flex-grow 0.25s ease;
+    }
+    .modal-btn:hover {
+    flex-grow: 2;
+    }
+
+    .issue-card {
+    transition: transform 0.1s ease-in-out;
+    }
+    .issue-card:hover {
+    transform: scale(1.01);
+    }
+
+    .urgent-cards {
+    box-shadow: 0 0 5px 5px #dc354550;
+    }
+
+    .issue-footer {
+    position: absolute;
+    top: 0%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    }
+{% endblock extra_style %}
+{% block main %}
+    {% load static %}
+    <div id="main-container" class="container">
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="alert alert-{% if msg.tags == "error" %}danger{% else %}success{% endif %} d-flex flex-row" role="alert">
+                    <div class="flex-grow-1">{{ msg }}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <h1>Issue Lists<img style="width: 40px" class="htmx-indicator" id="search-indicator" src="{% static "img/loading_bars.svg" %}"></h1>
+
+        
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="addon-wrapping"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+            </svg></span>
+
+            {% comment %} Search Bar {% endcomment %}
+            <input class="form-control search-select" type="search"
+                    name="filter_text" placeholder="Search {{ page_obj.paginator.count }} issues..."
+                    hx-get="contains/"
+                    hx-include="this"
+                    hx-trigger="input changed delay:250ms"
+                    hx-target="#issue-list"
+                    hx-indicator=".htmx-indicator"
+                    hx-swap="outerHTML"
+                    style="min-width: 120px"
+            >
+        {% comment %} </div>
+        <div class="input-group col-6 mb-3"> {% endcomment %}
+            <span class="input-group-text" style="max-width: 80px">Sort by</span>
+            <select
+                hx-get={% url "issues:search" %}
+                hx-trigger="change"
+                hx-target="#issue-list"
+                hx-swap="outerHTML"
+                hx-indicator=".htmx-indicator"
+                hx-include=".search-select"
+                name="sort_option"
+                id="sort-option"
+                class="form-select search-select flex-grow-1"
+                style="min-width: 100px"
+            >
+                <option disabled selected value="">Select an option</option>
+                {% for option in sort_form.fields.sort_option.choices %}
+                    <option value="{{ option.0 }}">{{ option.1 }}</option>
+                {% endfor %}
+            </select>
+            <button data-bs-toggle="modal" data-bs-target="#newIssueModal" class="btn btn-primary flex-grow-1">New Issue</button>
+        </div>
+        {% include "issues/issue_tab.html" %}
+        <center ><img style="width: 60px" class="htmx-indicator" src="{% static "img/loading_bars.svg" %}"></center>
+    </div>
+
+    {# The Modal for new_issue form #}
+    {% include "issues/issue_new.html" %}
+
+    {# Modal for confirm_delete #}
+    {% include "issues/issue_confirm_del.html" %}
+
+{% endblock main %}

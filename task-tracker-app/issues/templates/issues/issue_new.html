@@ -1,0 +1,68 @@
+{% comment %} The Modal for adding new issues {% endcomment %}
+<div class="modal fade" id="newIssueModal" tabindex="-1" aria-labelledby="issueModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog  modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="issueModalLabel"><em><span id="issueModalType">Add new issue as</span> <span class="text-success">{{ currUser.username }}</span></em></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form
+                action="{% url "issues:create_issue" %}"
+                method="post"
+            >
+                <div class="modal-body">
+                    {% csrf_token %}
+                    {% comment %} {{ form.as_p }} {% endcomment %}
+                    <div class="mb-2">
+                        <input placeholder="Your issue name (max 50 chars)" type="text" class="form-control mb-2 d-inline-block" id="issue_name" name="i_name" maxlength="50" required>
+
+                        is a&nbsp;
+                        <select class="form-select mb-2" style="width: auto; display:inline" id="ugc_rating" name="ugc_rating" required>
+                            <option value=1>miscallaneous task</option>
+                            <option value=2>non-urgent task</option>
+                            <option value=3>essential task</option>
+                            <option value=4 selected>urgent task</option>
+                            <option value=5>VERY urgent task</option>
+                        </select>
+                        ,&nbsp;which is&nbsp;
+                        <select class="form-select mb-2 w-auto" style="display:inline" id="dif_rating" name="dif_rating" required>
+                            <option value="1">very easy</option>
+                            <option value="2">easy</option>
+                            <option value="3">moderately hard</option>
+                            <option value="4" selected>hard</option>
+                            <option value="5">VERY hard</option>
+                        </select>
+                        and is&nbsp;
+                        <select class="form-select mb-2 overflow-hidden d-inline-block" style="width: auto;" id="deadline_or_not" onchange="show_date_pick()" required>
+                            <option value="0">unscheduled</option>
+                            <option value="1" selected>due by</option>
+                        </select>
+
+                        <input type="datetime-local" class="datetimeinput form-control" id="d_date" name="d_date" required style="display:inline; width: auto">
+
+                        <hr/>
+                        <textarea class="form-control" placeholder="Describe the specifics of your issue here..." id="issue_desc" name="i_desc" style="height: 100px"></textarea>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn btn btn-secondary" data-bs-dismiss="modal" style="width: 10px">Close</button>
+                    <button type="submit" class="modal-btn btn btn-primary" style="width: 10px" value="Submit">Save changes</button>
+                </div>
+            </form>
+            <script>
+                function show_date_pick() {
+                    dl_or_not = document.getElementById("deadline_or_not")
+                    if (dl_or_not.value  == "1") {
+                        document.getElementById("d_date").classList.remove("d-none");
+                        document.getElementById("d_date").setAttribute("required",true);
+                    }
+                    else {
+                        document.getElementById("d_date").classList.add("d-none");
+                        document.getElementById("d_date").removeAttribute("required");
+                    }
+                }
+            </script>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+{% comment %} Must pass a page_obj object in to utilise the navigator {% endcomment %}
+<li class="page-item flex-fill flex-fill {% if page_obj.number == 1 %}disabled{% endif %}"><a class="page-link" hx-get="?page=1">&laquo;</a></li>
+{% if page_obj.has_previous %}
+    <li class="page-item flex-fill"><a class="page-link" hx-get="?page={{ page_obj.previous_page_number }}">&lt;</a></li>
+{% else %}
+    <li class="page-item flex-fill disabled"><a class="page-link">&lt;</a></li>
+{% endif %}
+
+{% if page_obj.number > 2 %}
+    <li class="page-item flex-fill disabled d-none d-md-block"><a class="page-link">..</a></li>
+{% endif %}
+{% if page_obj.has_previous %}
+    <li class="page-item flex-fill d-none d-md-block"><a class="page-link" hx-get="?page={{ page_obj.previous_page_number}}">{{ page_obj.previous_page_number}}</a></li>
+{% endif %}
+<li class="page-item flex-fill active"><a class="page-link">{{ page_obj.number}}</a></li>
+
+{% if page_obj.has_next %}
+    <li class="page-item flex-fill d-none d-md-block"><a class="page-link" hx-get="?page={{ page_obj.next_page_number}}">{{ page_obj.next_page_number}}</a></li>
+{% endif %}
+
+{% if page_obj.next_page_number < page_obj.paginator.num_pages %}
+    <li class="page-item flex-fill disabled d-none d-md-block"><a class="page-link">..</a></li>
+{% endif %}
+
+{% if page_obj.has_next %}
+    <li class="page-item flex-fill"><a class="page-link" hx-get="?page={{ page_obj.next_page_number }}">&gt;</a></li>
+{% else %}
+    <li class="page-item flex-fill disabled"><a class="page-link">&gt;</a></li>
+
+{% endif %}
+
+<li class="page-item flex-fill  {% if page_obj.number == page_obj.paginator.num_pages %}disabled{% endif %}"><a class="page-link" hx-get="?page={{ page_obj.paginator.num_pages }}">&raquo;</a></li>
+
+{% comment %} Paginator block at parent template will look something like this
+    <div class="pagination d-flex justify-content-center" style="user-select: none" id="pagination-controller">
+        <nav aria-label="List Navigation" class="w-50 text-center">
+            <ul class="pagination d-flex" 
+                hx-target="#issue-list"
+                hx-select="#issue-list"
+                hx-swap="outerHTML transition:true"
+                hx-push-url="true"
+                hx-inherit="*"
+                hx-swap-oob="true"
+                hx-select-oob="#pagination-controller"
+                >
+                {% include "core/paginator_nav.html" %}
+            </ul>
+        </nav>
+    </div> {% endcomment %}

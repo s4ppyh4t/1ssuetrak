@@ -1,0 +1,60 @@
+{% with is_auth=currUser.is_authenticated %}
+<nav 
+    class="navbar bg-body-tertiary rounded navbar-expand-md sticky-top" 
+    style="
+        background: linear-gradient(to right, 
+            hsla(300, 100%, 20%, 30%),  /* Dark red */
+            hsla(240, 100%, 20%, 30%),  /* Dark magenta */
+            hsla(180, 100%, 20%, 30%),  /* Dark blue */
+            hsla(120, 100%, 20%, 30%),  /* Dark teal */
+            hsla(60, 100%, 20%, 30%)   /* Dark green */
+        );
+
+        box-shadow: 0 5px 5px 5px #00000020;
+    ">
+    <div class="container-fluid">
+        <a 
+        href="{% url "core:index" %}"
+        class="nav-item navbar-brand link-body-emphasis link-offset-2" 
+        style="font-family: monospace; text-decoration: overline; font-weight: bold; user-select: none;"><u>
+            <span class="text-danger">!</span>ssueTrak
+        </u></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapse" aria-controls="navCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navCollapse">
+            <ul class="navbar-nav me-auto my-2 my-lg-0 rounded text-right" style="--bs-scroll-height: 120px;">            
+                <li class="nav-item ">
+                    <a class="nav-link" href={% url "core:index" %}>Home</a>
+                </li>
+                <li class="nav-item">
+                    <div class="nav-item dropdown d-grid">
+                        <button class="nav-link dropdown-toggle text-left" data-bs-toggle="dropdown" role="button" aria-expanded="false" type="button" style="text-align: left" {% if not is_auth %}disabled{% endif %}>Pages</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href= {% url "issues:index" %} >Issue Board</a></li>
+                            <li><a class="dropdown-item" href= {% url "core:git_table" %} >GitHub Commits</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            <div class="d-flex justify-content-between" role="authenticate" style="gap: 20px;">
+                {% if currUser.is_authenticated %}
+                    {% if currUser.is_staff == 1 %}
+                        <a class="auth-btn btn btn-success flex-grow-1" href={% url "admin:index" %}>[{{ currUser.username }}]</a>
+                    {% else %}
+                        <a class="auth-btn btn btn-secondary flex-grow-1" href= "/">Hi, {{ currUser.username }}!</a>
+                    {% endif %}
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button class="auth-btn btn btn-outline-danger flex-grow-1" type="submit">Logout</button>
+                    </form>
+                {% else %}
+                    <a class="auth-btn btn btn-primary flex-grow-1" href= "{% url "login" %}">Login</a>
+                    
+                    <a class="auth-btn btn btn-secondary flex-grow-1" href= "{% url "signup" %}">Signup</a>
+                {% endif %}
+            </div>   
+        </div>
+    </div>
+</nav>
+{% endwith %}

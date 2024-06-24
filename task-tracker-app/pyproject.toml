@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "task-tracker-app"
+version = "0.1.0"
+description = "A Django app that allows house-sharing users to create solvable tasks and earn points to spend on favors"
+authors = ["s4ppyh4t <td.nguyen3320@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Django = "^5.0.6"
+uv = "^0.2.13"
+virtualenv = "^20.26.3"
+black = "^24.4.2"
+djhtml = "^3.0.6"
+pytz = "^2024.1"
+python-dotenv = "^1.0.1"
+faker = "^25.9.1"
+factory-boy = "^3.3.0"
+result = "^0.17.0"
+requests = "^2.32.3"
+jmespath = "^1.0.1"
+gunicorn = "^22.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
