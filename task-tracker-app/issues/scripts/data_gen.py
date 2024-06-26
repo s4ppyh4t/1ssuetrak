@@ -1,7 +1,8 @@
-import factory, factory.django, factory.fuzzy
+import factory
+import factory.django 
+import factory.fuzzy
 from issues.models import Issue, IssueOwner
-import pytz, datetime
-import random
+import datetime
 
 
 class IssueFactory(factory.django.DjangoModelFactory):

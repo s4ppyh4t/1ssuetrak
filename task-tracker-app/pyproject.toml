@@ -21,6 +21,7 @@ result = "^0.17.0"
 requests = "^2.32.3"
 jmespath = "^1.0.1"
 gunicorn = "^22.0.0"
+ruff = "^0.4.10"
 
 
 [build-system]

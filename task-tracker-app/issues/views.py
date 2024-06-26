@@ -12,9 +12,9 @@ import datetime
 
 # * Django imports
 from django.contrib.messages import error, success
-from django.db import DatabaseError, IntegrityError, transaction
-from django.db.models import F, Q
-from django.http import Http404, QueryDict
+from django.db import DatabaseError, transaction
+from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import ListView

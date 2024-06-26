@@ -3,10 +3,10 @@ import datetime
 import pytz
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.functions import Now
+# from django.db.models.functions import Now
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
-from faker import Faker, factory
+# from django.utils.translation import gettext_lazy as _
+# from faker import Faker, factory
 
 
 # Create your models here.
@@ -27,10 +27,6 @@ class Issue(models.Model):
         HARD = 4
         VERY_HARD = 5
 
-    class Rating_RCR(models.TextChoices):
-        R = "Recurring"
-        O = "One-Time"
-
     i_name = models.CharField(max_length=50, default="New Issue")
     i_desc = models.CharField(max_length=512, default="No desc", blank=True)
     ugc_rating = models.IntegerField(
@@ -38,9 +34,6 @@ class Issue(models.Model):
     )
     dif_rating = models.IntegerField(
         default=Rating_DIF.EASY, choices=Rating_DIF.choices
-    )
-    recur = models.CharField(
-        max_length=10, default=Rating_RCR.O, choices=Rating_RCR.choices
     )
     i_date = models.DateTimeField(verbose_name="issue_date", default=timezone.now)
     s_date = models.DateTimeField(verbose_name="solved_date", blank=True, null=True)

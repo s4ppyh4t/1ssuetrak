@@ -141,7 +141,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/accounts/logout-success"
 
-CSRF_TRUSTED_ORIGINS = [ "http://266jp.local:88" ]
+CSRF_TRUSTED_ORIGINS = [ "http://266jp.local:88", "http://266jaspurr.ddns.net:88", "http://192.168.0.1:88" ]
 
 # CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
