@@ -22,7 +22,12 @@ requests = "^2.32.3"
 jmespath = "^1.0.1"
 gunicorn = "^22.0.0"
 ruff = "^0.4.10"
+pillow = "^10.3.0"
 
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.26.0"
+django-debug-toolbar = "^4.4.2"
 
 [build-system]
 requires = ["poetry-core"]

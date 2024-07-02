@@ -7,32 +7,32 @@ icluding but not limitied to the following operations:
 
 # * Python base imports
 import datetime
-
+import time
 # import pytz
 
 # * Django imports
 from django.contrib.messages import error, success
 from django.db import DatabaseError, transaction
-from django.db.models import Q
-from django.http import Http404
+from django.db.models import Q, Prefetch, Count
+from django.http import Http404, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import ListView
 
 # * Issue app imports
-from .forms import issueCreateOrUpdateForm
-from .models import Issue, IssueOwner
+from .models import Issue, IssueOwner, IssueComment
 from .scripts.data_gen import IssueFactory
+from .forms import issueCreateOrUpdateForm
 from .forms import issueSortForm
+from .forms import issueCommentForm
 
 
-# todo >>> Base list view with pagination for issues:index <<<
+#! >>> Base list view with pagination for issues:index <<< DONE
 class IssueListView(ListView):
     """
     Issue's ListView - subclass of Dj Generic Class-based View
 
     """
-
     paginate_by = 12
     queryset = None
     extra_context = {}
@@ -46,7 +46,7 @@ class IssueListView(ListView):
         return context
 
     def get_queryset(self):
-        query = Issue.objects.all().order_by(f"-{self.date_field}")
+        query = Issue.objects.prefetch_related(Prefetch("o_uid", queryset=IssueOwner.objects.select_related("user"))).order_by(f"-{self.date_field}")
 
         if self.sort_option:
             query = query.order_by(self.sort_option)
@@ -62,7 +62,6 @@ class IssueListView(ListView):
 
 def index(request):
     context = {
-        "currUser": request.user,
         "title": "1ssues Board",
         "filter_text": None,
         "sort_form": issueSortForm(),
@@ -77,6 +76,7 @@ def search_contains(request):
     """Accept a filter text and pass it into :view:`issues.IssueListView`
     as a filter criteria to filter :model:`issues.Issue`
     """
+    # time.sleep(2)
     sort_option = request.GET.get("sort_option") or None
     filter_text = request.GET.get("filter_text") or None
     return IssueListView.as_view(
@@ -203,13 +203,82 @@ def delete_issue(request):
 
     return redirect(to=reverse("issues:index"))
 
-
 #! >>> For detail gathering (possibly showing "update" page) DONE
 def get_issue_details(request, i_pk):
+    target_issue = get_object_or_404(Issue, pk=i_pk)
     context = {
-        "issue": get_object_or_404(Issue, pk=i_pk),
-        # "model": Issue,
-        "currUser": request.user,
+        "issue": target_issue,
         "form": issueCreateOrUpdateForm(),
+        "comments": IssueComment
+                        .objects
+                        .prefetch_related(
+                            Prefetch(
+                                "commenter",
+                                queryset=IssueOwner.objects.select_related("user")
+                            )
+                        )
+                        .filter(issue=i_pk)
+                        .order_by("-c_date"),
+        "ownership": request.user != target_issue.o_uid.user
     }
     return render(request, "issues/issue_detail.html", context=context)
+
+""" == ISSUE_OWNER VIEWS & ISSUE_COMMENT VIEWS ==
+- The code below provide user with endpoints to work with the IssueOwner class/table 
+icluding but not limitied to the following operations:
+    + Creation (not including sign-up) / Read / Update (only avatar and name) / (No Deletion)
+
+- For issue comments, the following views are also made to allow users to comment on Issues, 
+as long as they are authenticated:
+    + CR operations (no updates and delete, for fun :D)
+"""
+def owner_details(request, u_pk):
+    issueOwner = IssueOwner.objects.prefetch_related("user").get(pk=u_pk)
+    issueList = Issue.objects                           \
+                    .prefetch_related("o_uid")          \
+                    .filter(o_uid=u_pk)                 \
+                    .order_by("-i_date", "-d_date")
+    
+    commentList = IssueComment.objects                  \
+                              .prefetch_related(    
+                                   Prefetch(
+                                        'issue', 
+                                        queryset=Issue.objects.select_related('o_uid')
+                                        ))              \
+                              .filter(commenter=u_pk)   \
+                              .order_by("-c_date")
+    
+    look_range = 21
+
+    analysis_data = { item['i_date__date'].strftime("%b-%d") : item["i_count"]  for item in list(issueList.filter(i_date__range=( datetime.datetime.today() - datetime.timedelta(days=look_range), datetime.datetime.today())).values("i_date__date").annotate(i_count=Count('pk')).values("i_date__date", "i_count").order_by("i_date__date")) }
+    all_dates = [d.strftime("%b-%d") for d in (datetime.date.today() - datetime.timedelta(days=i) for i in range(look_range,-1,-1))]
+    print(analysis_data)
+    context = {
+        "issues": issueList,
+        "comments": commentList,
+        "user": issueOwner,
+        "graph_data": {
+            "i_date": all_dates,
+            "i_count": [analysis_data.get(d, 0) for d in all_dates]
+        }
+    }
+
+    return render(request, "issues/user_detail.html", context=context)
+
+
+def create_comment(request, i_pk):
+    issue_obj = Issue.objects.get(pk=i_pk)
+    if request.method != "POST":
+        error(request, "Please use POST")
+        return redirect(reverse("issues:issue_details", args=[i_pk]))
+    payload: QueryDict = request.POST.copy()
+
+    payload.appendlist("commenter", request.user)
+    payload.appendlist("issue", issue_obj)
+    cmt_form = issueCommentForm(payload)
+
+    if not cmt_form.is_valid():
+        error(request, f"Something went wrong {cmt_form.errors}")
+    cmt_form.save()
+    # return render(request, "issues/issue_comment.html")
+    return redirect(reverse("issues:issue_details", args=[i_pk]))

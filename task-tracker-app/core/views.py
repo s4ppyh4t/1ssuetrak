@@ -9,7 +9,7 @@ from django.http import HttpResponseNotFound
 from django.contrib.messages import success, error
 
 # customer imports
-from core.forms import SignupForm
+from core.forms import SignupForm, IssueOwnerForm
 from .scripts.git_commit_parser import scrape_commits
 from issues.models import IssueOwner
 
@@ -47,21 +47,29 @@ def auth_signup(request):
     return render(
         request,
         "registration/signup_bs.html",
-        {"currUser": request.user, "form": None, "is_filled": False},
+        {"currUser": request.user, "form": None, "is_filled": False, "owner_form": IssueOwnerForm()},
     )
 
 
 @transaction.atomic
 def api_createuser(request):
     # SignupForm
+    payload = request.POST.copy()
     if request.method == "POST":
-        form = SignupForm(request.POST)
-        print(request.POST)
+        form = SignupForm(payload)
+        print(payload)
+        print(request.FILES)
         if form.is_valid():
             # Save the user created from the form
             try:
                 u = form.save()
-                IssueOwner(user=u, pts=0).save()
+
+                # prepare for issueowner creation
+                payload.appendlist("user", u)
+                ownerForm = IssueOwnerForm(payload, request.FILES)
+                if not ownerForm.is_valid():
+                    raise Exception("something is wrong")
+                ownerForm.save()
                 success(request, f"User {u.username} has been saved successfully")
             except Exception as e:
                 error(request, f"An error has occured: {e}")

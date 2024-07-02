@@ -1,97 +1,126 @@
-<div id="main-container" class="mt-5 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3>Edit issue #{{ issue.pk }}</h3>
+{% extends "issues/index.html" %}
+{% block main %}
+    <div id="main-container" class="mt-3 mb-5">
+        {% if messages or ownership%}
+            <div class="alert alert-warning d-flex flex-row" role="alert">
+                <div class="flex-grow-1">
+                    <ul>
+                        {% for msg in messages %}
+                            <li>{{ msg }}</li>
+                        {% endfor %}
+                        {% if ownership %}
+                            <li>You are not the owner of this Issue, and therefore cannot make changes</li>
+                        {% endif %}
+                    </ul>
                 </div>
-                <div class="card-body">
-                    <form action="{% url 'issues:create_issue' %}" method="post">
-                        {% csrf_token %}
-                        <input hidden name="i_pk" value="{{ issue.pk }}">
-                        <div>
-                            <div class="mb-2">
-                                <div class="input-group mb-3">
-                                    <label for="issue_name" class="input-group-text">Name</label>
-                                    <input value="{{issue.i_name}}" type="text" class="form-control" id="issue_name"
-                                           name="i_name" maxlength="50" required>
-                                </div>
-
-                                <div class="input-group mb-3">
-                                    <label for="ugc_rating" class="input-group-text">Urgency Rating</label>
-                                    <select value="{{issue.ugc_rating}}" class="form-select" id="ugc_rating"
-                                            name="ugc_rating" required>
-                                        {% for ugc_choice in issue.Rating_UGC.choices %}
-                                            <option value="{{ugc_choice.0}}" {% if ugc_choice.0 == issue.ugc_rating%}selected{% endif %}>{{ugc_choice.1}}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="input-group mb-3">
-                                    <label for="dif_rating" class="input-group-text">Difficulty</label>
-                                    <select value="{{issue.dif_rating}}" class="form-select" id="dif_rating"
-                                            name="dif_rating" required>
-                                        {% for dif_choice in issue.Rating_DIF.choices %}
-                                            <option value="{{dif_choice.0}}"
-                                                    {% if dif_choice.0 == issue.dif_rating%}selected{% endif %}>
-                                                {{dif_choice.1}}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-text">
-                                        <input {% if issue.d_date %}checked{% endif %} onchange="show_date_pick()" id="deadline_or_not"
-                                               class="form-check-input mt-0" type="checkbox" value="">
-                                        &nbsp;
-                                        <label for="deadline_or_not" class="">Due Date</label>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+        <div class="row justify-content-center">
+            <div class="col-md-6 mb-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Issue #{{ issue.pk }} by <span class="text-primary">{{ issue.o_uid.user.username }}</span></h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="{% url 'issues:create_issue' %}" method="post">
+                            {% csrf_token %}
+                            <input hidden name="i_pk" value="{{ issue.pk }}">
+                            <div>
+                                <div class="mb-2">
+                                    <div class="input-group mb-3">
+                                        <label for="issue_name" class="input-group-text">Name</label>
+                                        <input value="{{issue.i_name}}" type="text" class="form-control" id="issue_name"
+                                               name="i_name" maxlength="50" required>
                                     </div>
-                                    <input type="datetime-local" class="datetimeinput form-control" id="d_date"
-                                           name="d_date" value="{{ issue.d_date.isoformat }}">
-                                </div>
-                                <hr />
-                                <div class="input-group mb-3">
-                                    <label for="issue_desc" class="input-group-text">Description</label>
-                                    <textarea class="form-control"
-                                              placeholder="Describe the specifics of your issue here..." id="issue_desc"
-                                              name="i_desc" style="height: 100px">{{issue.i_desc}}</textarea>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="reset" class="modal-btn btn btn-outline-secondary w-25">Reset</button>
-                                    <button type="button" class="modal-btn btn btn-danger w-25" {% if currUser.pk != issue.o_uid.pk %}disabled{% endif %}  onclick="deleteConfirmShow({{ issue.pk }})">Delete</button>
-                                    <button type="submit" class="modal-btn btn btn-primary w-25" value="Submit">Save changes</button>
-                                </div>
-                                <hr/>
-                                <div class="d-grid">
-                                    <button
-                                        type="button"
-                                        class="btn btn-info"
-                                        hx-get="{% url "issues:index" %}"
-                                        hx-swap="outerHTML transition:true show:window:top"
-                                        hx-target="main"
-                                        hx-select="main"
-                                        hx-push-url="true"
-                                    >Back to List</button>
+
+                                    <div class="input-group mb-3">
+                                        <label for="ugc_rating" class="input-group-text">Urgency Rating</label>
+                                        <select value="{{issue.ugc_rating}}" class="form-select" id="ugc_rating"
+                                                name="ugc_rating" required>
+                                            {% for ugc_choice in issue.Rating_UGC.choices %}
+                                                <option value="{{ugc_choice.0}}" {% if ugc_choice.0 == issue.ugc_rating%}selected{% endif %}>{{ugc_choice.1}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <label for="dif_rating" class="input-group-text">Difficulty</label>
+                                        <select value="{{issue.dif_rating}}" class="form-select" id="dif_rating"
+                                                name="dif_rating" required>
+                                            {% for dif_choice in issue.Rating_DIF.choices %}
+                                                <option value="{{dif_choice.0}}"
+                                                        {% if dif_choice.0 == issue.dif_rating%}selected{% endif %}>
+                                                    {{dif_choice.1}}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-text">
+                                            <input {% if issue.d_date %}checked{% endif %} onchange="show_date_pick()" id="deadline_or_not"
+                                                   class="form-check-input mt-0" type="checkbox" value="">
+                                            &nbsp;
+                                            <label for="deadline_or_not" class="">Due Date</label>
+                                        </div>
+                                        <input type="datetime-local" class="datetimeinput form-control" id="d_date"
+                                               name="d_date" value="{{ issue.d_date.isoformat }}">
+                                    </div>
+                                    <hr />
+                                    <div class="input-group mb-3">
+                                        <label for="issue_desc" class="input-group-text">Description</label>
+                                        <textarea class="form-control"
+                                                  placeholder="Describe the specifics of your issue here..." id="issue_desc"
+                                                  name="i_desc" style="height: 100px">{{issue.i_desc}}</textarea>
+                                    </div>
+                                    <div class="btn-group w-100" role="group">
+                                        <button type="reset" class="modal-btn btn btn-outline-secondary w-25">Reset</button>
+                                        <button type="button" class="modal-btn btn btn-outline-danger w-25" {% if ownership %}disabled{% endif %}  onclick="deleteConfirmShow({{ issue.pk }})">Delete</button>
+                                        <button type="submit" class="modal-btn btn btn-outline-primary w-25" {% if ownership %}disabled{% endif %} value="Submit">Save changes</button>
+                                    </div>
+                                    <hr/>
+                                    <div class="btn-group w-100" role="group">
+                                        <button
+                                            class="modal-btn btn btn-info"
+                                            hx-get="{% url "issues:index" %}" hx-swap="outerHTML transition:true show:window:top" hx-select="main" hx-target="main" hx-push-url="true"
+                                        >Back to List</button>
+                                        <button
+                                            class="modal-btn btn btn-secondary"
+                                            hx-get="{% url "issues:user_details" issue.o_uid.pk %}" hx-swap="outerHTML transition:true show:window:top" hx-select="main" hx-target="main" hx-push-url="true"
+                                        >Back to Owner: {{ issue.o_uid.user.username }}</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
+            </div>
+            <div class="col-md-6 mb-5">
+                {% include "issues/issue_comment.html" %}
             </div>
         </div>
     </div>
-</div>
+{# Modal for confirm_delete #}
+    {% include "issues/issue_confirm_del.html" %}
 
-<script>
-    function show_date_pick() {
-        if (document.getElementById("deadline_or_not").checked) {
-            document.getElementById("d_date").removeAttribute("disabled");
-            document.getElementById("d_date").setAttribute("required", true);
+    <script>
+        function show_date_pick() {
+            if (document.getElementById("deadline_or_not").checked) {
+                document.getElementById("d_date").removeAttribute("disabled");
+                document.getElementById("d_date").setAttribute("required", true);
+            }
+            else {
+                document.getElementById("d_date").setAttribute("disabled", true);
+                document.getElementById("d_date").removeAttribute("required");
+            }
         }
-        else {
-            document.getElementById("d_date").setAttribute("disabled", true);
-            document.getElementById("d_date").removeAttribute("required");
-        }
-    }
 
-    show_date_pick();
-</script>
+        show_date_pick();
+
+        function deleteConfirmShow(i_pk) {
+            deleteModal = new bootstrap.Modal(document.getElementById("confirmDeleteModal"));
+            document.getElementById("confirmDeleteBody").innerHTML = `Are you sure you want to delete Issue <input class='d-none' readonly type='text' name='i_pk' value=${i_pk}>#${i_pk}?`;
+            document.getElementById("confirmDeleteBody")
+            deleteModal.show();
+        }
+    </script>
+{% endblock main %}

@@ -20,11 +20,14 @@ import core, issues
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
 
 # app_name='mainsp'
 
 urlpatterns = [
     path("", include("core.urls")),
+    path("__debug__/", include("debug_toolbar.urls")),
     path("admin/doc/", include("django.contrib.admindocs.urls")),
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
@@ -36,3 +39,6 @@ urlpatterns = [
     path("accounts/signupsubmit", core.views.api_createuser, name="signup_submit"),
     path("issues/", include("issues.urls")),
 ]
+
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -47,9 +47,11 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     "issues.apps.IssuesConfig",
     "django.contrib.admindocs",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -128,6 +130,10 @@ USE_TZ = False
 
 STATIC_ROOT = "/static/"
 STATIC_URL = "/static/"
+
+MEDIA_URL = "/images/"
+MEDIA_ROOT = BASE_DIR / "static/img"
+
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -141,8 +147,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/accounts/logout-success"
 
-CSRF_TRUSTED_ORIGINS = [ "http://266jp.local:88", "http://266jaspurr.ddns.net:88", "http://192.168.0.1:88" ]
+CSRF_TRUSTED_ORIGINS = [ "http://266jp.local:88", "http://266jaspurr.ddns.net:88", "http://192.168.0.101:88" ]
 
 # CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 # CRISPY_TEMPLATE_PACK = "bootstrap5"
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    "0.0.0.0",
+    "192.168.0.129",
+    # ...
+]

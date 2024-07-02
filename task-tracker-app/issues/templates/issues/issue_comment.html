@@ -1,0 +1,26 @@
+<div id="comment_section" class="card mb-3">
+    <div class="card-header">
+        <h5>Comments ({{ comments|length }})</h5>
+    </div>
+    <div class="card-body">
+        <div class="overflow-auto" style="max-height:20em">
+            {% for cmt in comments %}
+                <div class="d-flex mb-3">
+                    <img src="{{ cmt.commenter.profile_img.url }}" alt="Profile Picture" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                    <div class="flex-grow-1">
+                        <span><b class="mb-0">{{ cmt.commenter.user.username }}</b> <span class="text-secondary text-opacity-50">@{{ cmt.c_date }}</span></span>
+                        <p class="text-muted">{{ cmt.c_cont }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <form hx-swap="outerHTML transition:true" hx-target="#comment_section" hx-select="#comment_section" hx-post="{% url 'issues:create_comment' issue.pk %}">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <textarea name="c_cont" class="form-control" rows="2" placeholder="Leave a comment..."></textarea>
+                <button type="submit" class="btn btn-primary">Comment</button>
+            </div>
+        </form>
+
+    </div>
+</div>

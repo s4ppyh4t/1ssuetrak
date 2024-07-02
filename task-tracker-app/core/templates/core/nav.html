@@ -1,48 +1,49 @@
-{% with is_auth=currUser.is_authenticated %}
-<nav 
-    class="navbar bg-body-tertiary rounded navbar-expand-md sticky-top" 
-    style="
-        background: linear-gradient(to right, 
-            hsla(300, 100%, 20%, 30%),  /* Dark red */
-            hsla(240, 100%, 20%, 30%),  /* Dark magenta */
-            hsla(180, 100%, 20%, 30%),  /* Dark blue */
-            hsla(120, 100%, 20%, 30%),  /* Dark teal */
-            hsla(60, 100%, 20%, 30%)   /* Dark green */
-        );
-
-        box-shadow: 0 5px 5px 5px #00000020;
-    ">
+{% with is_auth=request.user.is_authenticated %}
+<style>
+    .navbar {
+        background-image: linear-gradient(to right, #0d6efd80 0%, #0d6efd50 40%, #0d6efd10 100%);
+        z-index: 1040;
+      }
+</style>
+<nav class="navbar bg-body-tertiary navbar-expand-md sticky-top">
     <div class="container-fluid">
+        {% load static %}
         <a 
         href="{% url "core:index" %}"
         class="nav-item navbar-brand link-offset-2" 
-        style="font-family: monospace; text-decoration: overline; font-weight: bold; user-select: none;"><u>
-            <span class="text-danger">1</span>ssueTrak
-        </u></a>
+        style=""><img src="{% static "favicon.ico" %}" alt="logo" height="40px"></a>
+        
+        
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapse" aria-controls="navCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navCollapse">
-            <ul class="navbar-nav me-auto my-2 my-lg-0 rounded text-right" style="--bs-scroll-height: 120px;">            
-                <li class="nav-item ">
+            <ul class="navbar-nav nav-underline me-auto my-2 my-lg-0 text-center" style="--bs-scroll-height: 120px; user-select: none;">            
+                <li class="nav-item">
                     <a class="nav-link" href={% url "core:index" %}>Home</a>
                 </li>
                 <li class="nav-item">
-                    <div class="nav-item dropdown d-grid">
-                        <button class="nav-link dropdown-toggle text-left" data-bs-toggle="dropdown" role="button" aria-expanded="false" type="button" style="text-align: left" {% if not is_auth %}disabled{% endif %}>Pages</button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href= {% url "issues:index" %} >Issue Board</a></li>
-                            <li><a class="dropdown-item" href= {% url "core:git_table" %} >GitHub Commits</a></li>
-                        </ul>
-                    </div>
+                    <a class="nav-link" href= {% url "issues:index" %} >Issue Board</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href= {% url "core:git_table" %} >GitHub Commits</a>
                 </li>
             </ul>
             <div class="d-flex justify-content-between" role="authenticate" style="gap: 20px;">
-                {% if currUser.is_authenticated %}
-                    {% if currUser.is_staff == 1 %}
-                        <a class="auth-btn btn btn-success flex-grow-1" href={% url "admin:index" %}>[{{ currUser.username }}]</a>
+                {% if request.user.is_authenticated %}
+                    {% if request.user.is_staff == 1 %}
+                        <a class="auth-btn btn btn-success flex-grow-1" href={% url "admin:index" %}>[{{ request.user.username }}]</a>
                     {% else %}
-                        <a class="auth-btn btn btn-secondary flex-grow-1" href= "/">Hi, {{ currUser.username }}!</a>
+                        <a 
+                            class="auth-btn btn btn-secondary flex-grow-1" 
+                            hx-get="{% url "issues:user_details" request.user.pk %}" 
+                            hx-swap="outerHTML transition:true show:window:top" 
+                            hx-target="#main-container" 
+                            hx-select="#main-container" 
+                            hx-push-url="true"
+                        >
+                            Hi, {{ request.user.username }}!
+                        </a>
                     {% endif %}
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}

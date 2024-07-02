@@ -1,0 +1,184 @@
+{% extends "issues/index.html" %}
+{% block main %}
+<div id="main-container" class="container mt-3">
+  
+  <div class="row d-flex mb-3 h-100">
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <div class="">
+            <img src="{{user.profile_img.url}}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px;">
+            <h3>{{user.user.username}}</h3>
+            <p>Joined on: {{user.user.date_joined}}</p>
+            <hr/>
+            <div class="d-grid mb-3">
+              <button class="mb-2 btn btn-info" type="button"
+                class="btn btn-info flex-grow-1"
+                hx-get="{% url "issues:index" %}"
+                hx-swap="outerHTML transition:true show:window:top"
+                hx-target="main"
+                hx-select="main"
+                hx-push-url="true" role="button">
+                Back to List
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-12 col-md-8 mb-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="row d-flex">
+            <div class="mb-4">
+              {% with user_insight=user.get_insights %}
+              <label>Issues owned/solved status</label>
+              <div class="progress-stacked h-auto">
+                <div class="progress" role="progressbar" aria-label="Issue made" aria-valuenow="{{ user_insight.total_issue }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ user_insight.unsolve_ratio }}%; height: 3em;">
+                  <div class="progress-bar bg-secondary">Made {{ user_insight.total_issue }} issues</div>
+                </div>
+                <div class="progress" role="progressbar" aria-label="Issue solved" aria-valuenow="{{ user_insight.issue_solved }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ user_insight.solve_ratio }}%; height: 3em;">
+                  <div class="progress-bar">Solved {{ user_insight.issue_solved }} issues</div>
+                </div>
+              </div>
+              {% endwith %}
+            </div>
+            <div class="mb-4">
+              <label>Participative Solvency (PS) earned this month</label>
+              {% with user_pts=user.pts %}
+              <div class="progress" role="progressbar" aria-label="PS earned month" aria-valuenow="{{ user_pts }}" aria-valuemin="0" aria-valuemax="100" style="height: 3em;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: {{ user_pts }}%">{{ user_pts }} ps</div>
+              </div>
+              {% endwith %}
+            </div> 
+          </div>
+          <div class="row">
+            <label class="mb-1">Activity in the last 21 days</label>
+            <div class="chart-container" style="position: relative; height: 8.5em">
+              <canvas id="myChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex ">
+    <div class="col-md-12">  
+      <div class="row">
+        <h4>Issues owned by this user</h4>
+        <div class="overflow-auto" style="max-height: 20em;">
+          <table id="userIssueTable" class="table table-striped table-hover" style="user-select: none">
+            <thead id="userIssueTableHead" class="sticky-top">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">UGC</th>
+                <th scope="col">DIF</th>
+                <th scope="col">Issue date</th>
+                <th scope="col">Due date</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="userIssueTableBody">
+              {% for issue in issues %}
+                <tr 
+                  hx-get="{% url "issues:issue_details" issue.pk %}" 
+                  hx-swap="outerHTML transition:true show:window:top" 
+                  hx-target="main"
+                  hx-select="main"
+                  hx-push-url="true"
+                >
+                  <th scope="row">{{ issue.pk }}</th>
+                  <td>{{ issue.i_name }}</td>
+                  <td><span class="badge bg-danger flex-grow-1">{{ issue.get_ugc_rating_display }}</span></td>
+                  <td><span class="badge bg-primary flex-grow-1">{{ issue.get_dif_rating_display }}</span></td>
+                  <td>{{ issue.i_date }}</td>
+                  <td>{{ issue.d_date }}</td>
+                  <td>{{ issue.get_i_status_display }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <br/>
+      <hr/>
+      <br/>
+      <div class="row">
+        <h4>Comments made by this user</h4>
+        <div class="overflow-auto" style="max-height: 20em;">
+          <table id="userIssueTable" class="table table-striped table-hover" style="user-select: none">
+            <thead id="userIssueTableHead" class="sticky-top">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">on Issue</th>
+                <th scope="col">Comment content</th>
+                <th scope="col">Comment date</th>
+              </tr>
+            </thead>
+            <tbody id="userIssueTableBody">
+              {% for comment in comments %}
+                <tr 
+                  hx-get="{% url "issues:issue_details" comment.issue.pk %}" 
+                  hx-swap="outerHTML transition:true show:window:top" 
+                  hx-target="main"
+                  hx-select="main"
+                  hx-push-url="true"
+                >
+                  <th scope="row">{{ comment.pk }}</th>
+                  <td><span class="">#{{ comment.issue.pk }}</span></td>
+                  <td><span class="">{{ comment.c_cont }}</span></td>
+                  <td>{{ comment.c_date }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+  </div>  
+  </div>
+  <script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    // Sample data with more points (adjust labels and values as needed)
+    
+    // Chart data object with multiple datasets (optional for stacking)
+    var chartData = {
+      labels: {{ graph_data.i_date | safe }},
+      datasets: [{
+        label: 'Issues made',
+        data: {{ graph_data.i_count | safe }},
+        backgroundColor: '#0d6efd50',
+        borderColor: '#0d6efd',
+        borderWidth: 1
+      }]
+    };
+    
+    // Chart options with adjustments for more data
+    var chart = new Chart(ctx, {
+      type: 'bar',  // Change to 'bar' for stacking
+      data: chartData,
+      options: {
+        responsive: true, 
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            display: false,
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+        // Additional options for stacking or grouping (if applicable):
+        /*
+        stacked: true,  // Enable stacking for multiple datasets
+        */
+      }
+    });
+  </script>
+</div>
+
+
+{% endblock main %}

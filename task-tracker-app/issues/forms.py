@@ -2,6 +2,7 @@ from django import forms
 # from django.db import models
 
 from .models import Issue
+from .models import IssueComment
 
 # from crispy_bootstrap5 import
 
@@ -25,3 +26,8 @@ class issueSortForm(forms.Form):
         ("-dif_rating", "Difficulty (high to low)"),
     )
     sort_option = forms.ChoiceField(choices=SORT_OPTIONS)
+
+class issueCommentForm(forms.ModelForm):
+    class Meta:
+        model = IssueComment
+        fields = {"commenter", "issue", "c_cont"}

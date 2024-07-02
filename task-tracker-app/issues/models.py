@@ -11,8 +11,7 @@ from django.utils import timezone
 
 # Create your models here.
 class Issue(models.Model):
-
-    # Enumeration Types
+    # Enumeration Types 
     class Rating_UGC(models.IntegerChoices):
         MISC = 1
         NON_UGN = 2
@@ -39,13 +38,16 @@ class Issue(models.Model):
     s_date = models.DateTimeField(verbose_name="solved_date", blank=True, null=True)
     d_date = models.DateTimeField(verbose_name="deadline", blank=True, null=True)
     o_uid = models.ForeignKey(
-        to="IssueOwner", on_delete=models.PROTECT, related_name="owner_uid", default=2
+        to="IssueOwner", on_delete=models.PROTECT, default=2
     )
     i_status = models.BooleanField(
         default=False,
         choices=((False, "Not solved"), (True, "Solved")),
         verbose_name="Solve status",
     )
+
+    class Meta:
+        ordering = ["-i_date"]
 
     def __str__(self):
         return f"{self.i_name} - {self.i_date.strftime('%d/%m/%y @ %H:%M')} [{self.get_i_status_display()}]"
@@ -66,7 +68,6 @@ class IssueRec(models.Model):
         to="IssueOwner",
         on_delete=models.SET_NULL,
         null=True,
-        related_name="solver_uid",
         default=2,
     )
     i_cost = models.FloatField(max_length=50, verbose_name="issue_cost", default=0.0)
@@ -78,6 +79,28 @@ class IssueRec(models.Model):
 class IssueOwner(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     pts = models.IntegerField(default=0, verbose_name="UserPoints")
+    profile_img = models.ImageField(null=True, blank=True, default="default.jpg")
 
     def __str__(self):
         return f"{self.user.pk} - {self.user.username}: {self.pts} points"
+    
+    def get_insights(self):
+        issue_count = self.issue_set.count()
+        solved_count = self.issue_set.filter(i_status=True).count()
+        return {
+            "total_issue": issue_count,
+            "issue_solved": solved_count,
+            "solve_ratio": round((solved_count)/issue_count,2)*100,
+            "unsolve_ratio": round((issue_count - solved_count)/issue_count,2)*100
+        }
+
+
+class IssueComment(models.Model):
+    commenter = models.ForeignKey(
+        to="IssueOwner", on_delete=models.SET_NULL, null=True
+    )
+    issue = models.ForeignKey(
+        to="Issue", on_delete=models.CASCADE, 
+    )
+    c_cont = models.CharField(max_length=512, blank=False, default="No comment")
+    c_date = models.DateTimeField(verbose_name="comment_date", default=timezone.now)

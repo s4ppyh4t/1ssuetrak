@@ -13,6 +13,7 @@
                 hx-target="#issue-list"
                 hx-select=".issue-content"
                 hx-swap="beforeend"
+                hx-indicator=".htmx-indicator"
             {% endif %}
         >
             <div
@@ -20,7 +21,25 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-12 d-flex flex-column flex-sm-row align-items-center-sm">
-                            <span class="text-truncate flex-grow-1"><h5 class="text-truncate"><span class="text-primary">#{{ issue.pk }}</span> {{ issue.i_name|highlight:filter_text }}</h5><em>By {{ issue.o_uid.user.username }} <span class="text-secondary">@{{ issue.i_date }}</span></em></span>
+                            <span class="text-truncate flex-grow-1 mb-2">
+                                <h5 class="text-truncate">
+                                    <span class="text-primary">#{{ issue.pk }}</span> {{ issue.i_name|highlight:filter_text }}
+                                </h5>
+                                <em>By
+                                    <span
+                                        class="badge bg-info"
+                                        hx-get="{% url "issues:user_details" issue.o_uid.pk %}"
+                                        hx-swap="outerHTML transition:true show:window:top"
+                                        hx-target="#main-container"
+                                        hx-select="#main-container"
+                                        hx-push-url="true"
+                                        hx-indicator=".loading-bar"
+                                    >
+                                        {{ issue.o_uid.user.username }}
+                                    </span>
+                                    <span class="text-secondary">@{{ issue.i_date }}</span>
+                                </em>
+                            </span>
                             <div class="d-flex justify-content-around gap-1 align-items-center">
                                 <span class="badge bg-danger flex-grow-1">{{ issue.get_ugc_rating_display }}</span>
                                 <span class="badge bg-primary flex-grow-1">{{ issue.get_dif_rating_display }}</span>
@@ -45,9 +64,12 @@
                             <div class="overflow-auto" style="height: 4em;"><em>"{{ issue.i_desc }}"</em></div>
                         {% endif %}
                     </div>
-                    <div class="issue-footer d-none d-flex gap-2 p-2 align-items-center">
-                        <button hx-get="{% url "issues:issue_details" issue.pk %}" hx-swap="outerHTML transition:true show:window:top" hx-target="#main-container" type="button" class="modal-btn btn btn-secondary w-25" style="height: 2.5em">Edit</button>
-                        <button {% if currUser.pk != issue.o_uid.user.pk %}disabled{% endif %} type="button" class="modal-btn btn btn-danger w-25" style="height: 2.5em" onclick="deleteConfirmShow({{ issue.pk }})">Delete</button>
+                    <div class="issue-footer d-none btn-group p-2 align-items-center">
+                        <button hx-get="{% url "issues:issue_details" issue.pk %}"
+                                hx-swap="outerHTML transition:true show:window:top"
+                                hx-target="main"
+                                hx-select="main"
+                                hx-push-url="true" type="button" class="modal-btn btn btn-info w-25" style="height: 2.5em" >Details</button>
                         <button type="button" class="modal-btn btn btn-success w-25" style="height: 2.5em" >Solve!</button>
                     </div>
                 </div>
@@ -56,26 +78,5 @@
     {% empty %}
         <p>No issue matched</p>
     {% endfor %}
+
 </div>
-<script>
-    function toggleCardOverlay(object){
-        let status = object.querySelector('.issue-footer').classList.toggle("d-none");
-        // console.log(status);
-        if (!status) {
-            document.querySelectorAll(".issue-footer").forEach(
-                element => {
-                    element.classList.add("d-none");
-                }
-            );
-
-            object.querySelector('.issue-footer').classList.toggle("d-none");
-        }
-    }
-
-    function deleteConfirmShow(i_pk) {
-        deleteModal = new bootstrap.Modal(document.getElementById("confirmDeleteModal"));
-        document.getElementById("confirmDeleteBody").innerHTML = `Are you sure you want to delete Issue <input class='d-none' readonly type='text' name='i_pk' value=${i_pk}>#${i_pk}?`;
-        document.getElementById("confirmDeleteBody")
-        deleteModal.show();
-    }
-</script>

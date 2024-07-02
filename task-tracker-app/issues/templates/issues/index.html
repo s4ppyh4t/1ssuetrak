@@ -42,9 +42,9 @@
                 </div>
             {% endfor %}
         {% endif %}
-        <h1>Issue Lists<img style="width: 40px" class="htmx-indicator" id="search-indicator" src="{% static "img/loading_bars.svg" %}"></h1>
+        <h1>Issue Lists</h1>
 
-        
+
         <div class="input-group mb-3">
             <span class="input-group-text" id="addon-wrapping"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                 <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
@@ -52,24 +52,23 @@
 
             {% comment %} Search Bar {% endcomment %}
             <input class="form-control search-select" type="search"
-                    name="filter_text" placeholder="Search {{ page_obj.paginator.count }} issues..."
-                    hx-get="contains/"
-                    hx-include="this"
-                    hx-trigger="input changed delay:250ms"
-                    hx-target="#issue-list"
-                    hx-indicator=".htmx-indicator"
-                    hx-swap="outerHTML"
-                    style="min-width: 120px"
+                   name="filter_text" placeholder="Search {{ page_obj.paginator.count }} issues..."
+                   hx-get="contains/"
+                   hx-include="this"
+                   hx-trigger="input changed delay:250ms"
+                   hx-target="#issue-list"
+                   hx-indicator=".loading-bar"
+                   hx-swap="outerHTML"
+                   style="min-width: 120px"
             >
-        {% comment %} </div>
-        <div class="input-group col-6 mb-3"> {% endcomment %}
+
             <span class="input-group-text" style="max-width: 80px">Sort by</span>
             <select
                 hx-get={% url "issues:search" %}
                 hx-trigger="change"
                 hx-target="#issue-list"
                 hx-swap="outerHTML"
-                hx-indicator=".htmx-indicator"
+                hx-indicator=".loading-bar"
                 hx-include=".search-select"
                 name="sort_option"
                 id="sort-option"
@@ -90,7 +89,20 @@
     {# The Modal for new_issue form #}
     {% include "issues/issue_new.html" %}
 
-    {# Modal for confirm_delete #}
-    {% include "issues/issue_confirm_del.html" %}
-
 {% endblock main %}
+{% block extra_script %}
+    <script>
+        function toggleCardOverlay(object){
+            let status = object.querySelector('.issue-footer').classList.toggle("d-none");
+            if (!status) {
+                document.querySelectorAll(".issue-footer").forEach(
+                    element => {
+                        element.classList.add("d-none");
+                    }
+                );
+
+                object.querySelector('.issue-footer').classList.toggle("d-none");
+            }
+        }
+    </script>
+{% endblock extra_script %}
