@@ -15,5 +15,4 @@ class IssueOwnerForm(forms.ModelForm):
     class Meta:
         model = IssueOwner
         fields = ("user", "profile_img")
-
     

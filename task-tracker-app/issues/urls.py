@@ -8,6 +8,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("contains/", views.search_contains, name="search"),
     path("issue-details/<int:i_pk>/create-comment/", views.create_comment, name="create_comment"),
+    path("issue-details/<int:i_pk>/solve-issue/", views.solve_issue, name="solve_issue"),
     path("issue-details/<int:i_pk>", views.get_issue_details, name="issue_details"),
     path("generate-issues/", views.generate_issues, name="generate_issues"),
     path("create-issue/", views.create_issue, name="create_issue"),

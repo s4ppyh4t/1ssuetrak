@@ -44,7 +44,7 @@
                     var(--bs-primary), transparent
                 );
             }
-        
+
             .htmx-request.loading-bar {
                 opacity: 1;
                 animation: fadeIn 1s linear forwards, slide 0.8s ease-in-out infinite;
@@ -53,21 +53,21 @@
                 0%   { transform: translateX(-100%); }
                 100% { transform: translateX( 100%); }
             }
-        
+
             @keyframes fadeIn {
                 0%   { opacity: 0; }
                 50%  { opacity: 0; }
                 100% { opacity: 1; }
             }
 
-        {% block extra_style %}{% endblock extra_style %}
+            {% block extra_style %}{% endblock extra_style %}
         </style>
         {% block extra_export %}{% endblock extra_export %}
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </head>
     <body class="" hx-indicator=".loading-bar">
         {% include "core/nav.html" %}
-        <br/>            
+        <br/>
         <main class="container">
             <div class="loading-bar"></div>
             {% block main %}{% endblock main %}
@@ -76,9 +76,7 @@
         <footer>
             {% include "core/footer.html" %}
         </footer>
-        {% block extra_script %}
-
-        {% endblock extra_script %}
+        {% block extra_script %}{% endblock extra_script %}
     </body>
     <script>
         document.getElementById('btnModeSwitch').addEventListener('click',()=>{
@@ -89,16 +87,5 @@
                 document.documentElement.setAttribute('data-bs-theme','dark')
             }
         })
-
-        if (typeof window.htmx !== "undefined") {
-            htmx.on("htmx:afterSettle", function(detail) {
-                if (
-                    typeof window.djdt !== "undefined"
-                    && detail.target instanceof HTMLBodyElement
-                ) {
-                    djdt.show_toolbar();
-                }
-            });
-        }
     </script>
 </html>

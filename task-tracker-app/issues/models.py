@@ -35,7 +35,6 @@ class Issue(models.Model):
         default=Rating_DIF.EASY, choices=Rating_DIF.choices
     )
     i_date = models.DateTimeField(verbose_name="issue_date", default=timezone.now)
-    s_date = models.DateTimeField(verbose_name="solved_date", blank=True, null=True)
     d_date = models.DateTimeField(verbose_name="deadline", blank=True, null=True)
     o_uid = models.ForeignKey(
         to="IssueOwner", on_delete=models.PROTECT, default=2
@@ -71,14 +70,15 @@ class IssueRec(models.Model):
         default=2,
     )
     i_cost = models.FloatField(max_length=50, verbose_name="issue_cost", default=0.0)
+    s_date = models.DateTimeField(verbose_name="solved_date", default=timezone.now)
 
     def __str__(self):
-        return f"Issue {self.i_id} owned by {self.o_uid} - resolved by {self.s_uid}"
+        return f"Issue {self.i_id} resolved by {self.s_uid}"
 
 
 class IssueOwner(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    pts = models.IntegerField(default=0, verbose_name="UserPoints")
+    pts = models.IntegerField(default=100, verbose_name="UserPoints")
     profile_img = models.ImageField(null=True, blank=True, default="default.jpg")
 
     def __str__(self):
@@ -86,12 +86,12 @@ class IssueOwner(models.Model):
     
     def get_insights(self):
         issue_count = self.issue_set.count()
-        solved_count = self.issue_set.filter(i_status=True).count()
+        solved_count = self.issuerec_set.count()
         return {
             "total_issue": issue_count,
             "issue_solved": solved_count,
-            "solve_ratio": round((solved_count)/issue_count,2)*100,
-            "unsolve_ratio": round((issue_count - solved_count)/issue_count,2)*100
+            "solve_ratio": round((solved_count)/issue_count,2)*100 if issue_count != 0 else 0,
+            "unsolve_ratio": round((issue_count - solved_count)/issue_count,2)*100 if issue_count != 0 else 0
         }
 
 

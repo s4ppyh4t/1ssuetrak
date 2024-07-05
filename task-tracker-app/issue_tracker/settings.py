@@ -27,10 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-)4e+ow(%6jxqv1*smhh3vgxhp-^svm2kagp&ec^+1n&7m!o#vz'
 SECRET_KEY = os.environ["SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG") or True
+DEBUG = os.getenv("DEBUG") or False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -47,11 +46,11 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     "issues.apps.IssuesConfig",
     "django.contrib.admindocs",
-    "debug_toolbar",
+    # "debug_toolbar",
 ]
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    # "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

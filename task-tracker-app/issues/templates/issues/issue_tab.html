@@ -1,10 +1,11 @@
 {% load search_hl %}
 <div class="row" id="issue-list">
     {% for issue in page_obj %}
+        {% with issue_status=issue.i_status %}
         <div
             class="col-12 col-md-6 mb-3 issue-content"
             onclick="toggleCardOverlay(this)"
-            style="transition: all 0.5s ease;"
+            style="transition: all 0.5s ease; {% if issue_status %}opacity: 0.5{% endif %}"
 
             {% if forloop.last and page_obj.has_next and filter_text is None %}
                 hx-get="{% url "issues:search" %}?page={{ page_obj.next_page_number }}"
@@ -17,7 +18,7 @@
             {% endif %}
         >
             <div
-                class="issue-card card {% if issue.ugc_rating > 3 %}urgent-cards border-danger{% endif %} bg-body-tertiary h-100">
+                class="issue-card card {% if issue.ugc_rating > 3 and not issue_status %}urgent-cards border-danger{% endif %} bg-body-tertiary h-100">
                 <div class="card-header">
                     <div class="row">
                         <div class="col-12 d-flex flex-column flex-sm-row align-items-center-sm">
@@ -27,13 +28,7 @@
                                 </h5>
                                 <em>By
                                     <span
-                                        class="badge bg-info"
-                                        hx-get="{% url "issues:user_details" issue.o_uid.pk %}"
-                                        hx-swap="outerHTML transition:true show:window:top"
-                                        hx-target="#main-container"
-                                        hx-select="#main-container"
-                                        hx-push-url="true"
-                                        hx-indicator=".loading-bar"
+                                        class=""
                                     >
                                         {{ issue.o_uid.user.username }}
                                     </span>
@@ -49,9 +44,12 @@
                 </div>
                 <div
                     class="card-body d-flex flex-column justify-content-between"
-                    style="position: relative;">
+                    style="position: relative; {% if issue_status %}background-color: #011a0ed0;{% endif %}">
                 {% comment %} Toggle between truncate and no truncate on click {% endcomment %}
                     <div class="mb-2">
+                {% if issue_status %}
+                        <h4 class="text-success">Issue has been solved!</h4>
+                {% else %}
                         {% if issue.d_date is None %}
                             {{ issue.o_uid.user.username }} does not specify the issue's <b>due date.</b>
                         {% else %}
@@ -63,6 +61,7 @@
                         {% else %}
                             <div class="overflow-auto" style="height: 4em;"><em>"{{ issue.i_desc }}"</em></div>
                         {% endif %}
+                {% endif %}
                     </div>
                     <div class="issue-footer d-none btn-group p-2 align-items-center">
                         <button hx-get="{% url "issues:issue_details" issue.pk %}"
@@ -70,11 +69,21 @@
                                 hx-target="main"
                                 hx-select="main"
                                 hx-push-url="true" type="button" class="modal-btn btn btn-info w-25" style="height: 2.5em" >Details</button>
-                        <button type="button" class="modal-btn btn btn-success w-25" style="height: 2.5em" >Solve!</button>
+                        <button 
+                                hx-get="{% url "issues:user_details" issue.o_uid.pk %}"
+                                hx-swap="outerHTML transition:true show:window:top"
+                                hx-target="main"
+                                hx-select="main"
+                                hx-push-url="true"
+                                hx-indicator=".loading-bar"
+                                type="button" 
+                                class="modal-btn btn btn-secondary w-25" 
+                                style="height: 2.5em" >Owner page</button>
                     </div>
                 </div>
             </div>
         </div>
+        {% endwith %}   
     {% empty %}
         <p>No issue matched</p>
     {% endfor %}

@@ -1,6 +1,6 @@
 {% extends "issues/index.html" %}
 {% block main %}
-    <div id="main-container" class="mt-3 mb-5">
+    <div id="main-container" class="my-2">
         {% if messages or ownership%}
             <div class="alert alert-warning d-flex flex-row" role="alert">
                 <div class="flex-grow-1">
@@ -16,27 +16,39 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endif %}
+        {% with issue_status=issue.i_status %}
         <div class="row justify-content-center">
-            <div class="col-md-6 mb-2">
-                <div class="card">
+            <div class="col-md-6 mb-3">
+                <div class="btn-group w-100 mb-3" role="group">
+                    <button
+                        class="modal-btn btn btn-info"
+                        hx-get="{% url "issues:index" %}" hx-swap="outerHTML transition:true show:window:top" hx-select="main" hx-target="main" hx-push-url="true"
+                    >Back to List</button>
+                    <button
+                        class="modal-btn btn btn-secondary"
+                        hx-get="{% url "issues:user_details" issue.o_uid.pk %}" hx-swap="outerHTML transition:true show:window:top" hx-select="main" hx-target="main" hx-push-url="true"
+                    >Back to Owner: {{ issue.o_uid.user.username }}</button>
+                </div>
+                <div class="card {% if issue.i_status %}border-success{% endif %}">
                     <div class="card-header">
-                        <h3>Issue #{{ issue.pk }} by <span class="text-primary">{{ issue.o_uid.user.username }}</span></h3>
+                        <h3>Issue #{{ issue.pk }} by <span class="text-primary">{{ issue.o_uid.user.username }}</span> {% if issue_status %}<span class="text-success">SOLVED!</span>{% endif %}</h3>
                     </div>
                     <div class="card-body">
                         <form action="{% url 'issues:create_issue' %}" method="post">
                             {% csrf_token %}
                             <input hidden name="i_pk" value="{{ issue.pk }}">
+                            {% if issue_status %} <p class="text-warning">This issue is archived, you can no longer make changes to it, but comments are permitted.</p> {% endif %}
                             <div>
                                 <div class="mb-2">
                                     <div class="input-group mb-3">
                                         <label for="issue_name" class="input-group-text">Name</label>
-                                        <input value="{{issue.i_name}}" type="text" class="form-control" id="issue_name"
+                                        <input {% if issue_status or ownership %}disabled{% endif %} value="{{issue.i_name}}" type="text" class="form-control" id="issue_name"
                                                name="i_name" maxlength="50" required>
                                     </div>
 
                                     <div class="input-group mb-3">
                                         <label for="ugc_rating" class="input-group-text">Urgency Rating</label>
-                                        <select value="{{issue.ugc_rating}}" class="form-select" id="ugc_rating"
+                                        <select {% if issue_status or ownership %}disabled{% endif %} value="{{issue.ugc_rating}}" class="form-select" id="ugc_rating"
                                                 name="ugc_rating" required>
                                             {% for ugc_choice in issue.Rating_UGC.choices %}
                                                 <option value="{{ugc_choice.0}}" {% if ugc_choice.0 == issue.ugc_rating%}selected{% endif %}>{{ugc_choice.1}}</option>
@@ -45,7 +57,7 @@
                                     </div>
                                     <div class="input-group mb-3">
                                         <label for="dif_rating" class="input-group-text">Difficulty</label>
-                                        <select value="{{issue.dif_rating}}" class="form-select" id="dif_rating"
+                                        <select {% if issue_status or ownership %}disabled{% endif %} value="{{issue.dif_rating}}" class="form-select" id="dif_rating"
                                                 name="dif_rating" required>
                                             {% for dif_choice in issue.Rating_DIF.choices %}
                                                 <option value="{{dif_choice.0}}"
@@ -57,7 +69,7 @@
                                     </div>
                                     <div class="input-group mb-3">
                                         <div class="input-group-text">
-                                            <input {% if issue.d_date %}checked{% endif %} onchange="show_date_pick()" id="deadline_or_not"
+                                            <input {% if issue_status or ownership %}disabled{% endif %} {% if issue.d_date and not issue_status %}checked{% endif %} onchange="show_date_pick()" id="deadline_or_not"
                                                    class="form-check-input mt-0" type="checkbox" value="">
                                             &nbsp;
                                             <label for="deadline_or_not" class="">Due Date</label>
@@ -68,25 +80,14 @@
                                     <hr />
                                     <div class="input-group mb-3">
                                         <label for="issue_desc" class="input-group-text">Description</label>
-                                        <textarea class="form-control"
+                                        <textarea class="form-control" {% if issue_status or ownership %}disabled{% endif %}
                                                   placeholder="Describe the specifics of your issue here..." id="issue_desc"
                                                   name="i_desc" style="height: 100px">{{issue.i_desc}}</textarea>
                                     </div>
                                     <div class="btn-group w-100" role="group">
                                         <button type="reset" class="modal-btn btn btn-outline-secondary w-25">Reset</button>
-                                        <button type="button" class="modal-btn btn btn-outline-danger w-25" {% if ownership %}disabled{% endif %}  onclick="deleteConfirmShow({{ issue.pk }})">Delete</button>
-                                        <button type="submit" class="modal-btn btn btn-outline-primary w-25" {% if ownership %}disabled{% endif %} value="Submit">Save changes</button>
-                                    </div>
-                                    <hr/>
-                                    <div class="btn-group w-100" role="group">
-                                        <button
-                                            class="modal-btn btn btn-info"
-                                            hx-get="{% url "issues:index" %}" hx-swap="outerHTML transition:true show:window:top" hx-select="main" hx-target="main" hx-push-url="true"
-                                        >Back to List</button>
-                                        <button
-                                            class="modal-btn btn btn-secondary"
-                                            hx-get="{% url "issues:user_details" issue.o_uid.pk %}" hx-swap="outerHTML transition:true show:window:top" hx-select="main" hx-target="main" hx-push-url="true"
-                                        >Back to Owner: {{ issue.o_uid.user.username }}</button>
+                                        <button type="button" class="modal-btn btn btn-outline-danger w-25" {% if ownership or issue_status %}disabled{% endif %}  onclick="deleteConfirmShow({{ issue.pk }})">Delete</button>
+                                        <button type="submit" class="modal-btn btn btn-outline-primary w-25" {% if ownership or issue_status %}disabled{% endif %} value="Submit">Save changes</button>
                                     </div>
                                 </div>
                             </div>
@@ -94,10 +95,14 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 mb-5">
+            <div class="col-md-6 mb-3">
+                <span {% if issue.i_status %}style="opacity: 0.5"{% endif %}>
+                    {% include "issues/issue_solve.html" %}
+                </span>
                 {% include "issues/issue_comment.html" %}
             </div>
         </div>
+        {% endwith %}
     </div>
 {# Modal for confirm_delete #}
     {% include "issues/issue_confirm_del.html" %}

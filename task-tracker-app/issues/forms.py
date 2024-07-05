@@ -3,6 +3,7 @@ from django import forms
 
 from .models import Issue
 from .models import IssueComment
+from .models import IssueRec
 
 # from crispy_bootstrap5 import
 
@@ -31,3 +32,8 @@ class issueCommentForm(forms.ModelForm):
     class Meta:
         model = IssueComment
         fields = {"commenter", "issue", "c_cont"}
+
+class IssueRecForm(forms.ModelForm):
+    class Meta:
+        model = IssueRec
+        fields = { "i_id", "s_uid", "i_cost"}

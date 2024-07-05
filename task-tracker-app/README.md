@@ -16,7 +16,7 @@ This application is a personal project developed to help housemates (or people l
 The app allows users (`IssueOwner`) to:
 - Post their own `Issue`, so they can be *shared* amongst the group
 - CRUD operations on such `Issue`
-- Help solve others' `Issue` and receive `PS` (Participative Solvency)
+- Help solve others' `Issue` and receive `PS` (Participation Solvency)
 - With excess `PS`, one can post `Issue` to the Issue Board that offers a pre-determined amount of `PS` that one would see fit. The solver of such `Issue` will receive that much amount from the `IssueOwner`
 
 ... TODO

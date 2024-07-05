@@ -1,34 +1,35 @@
 {% extends "core/base.html" %}
+{% block title %}{{ title }}{% endblock title %}
 {% block nav_bar %}
     {{ nav_bar }}
 {% endblock nav_bar %}
 {% block main %}
-<style>
-    #title_time {
-        font-size: 10vw; 
-        font-weight: bold; 
-        user-select: none; 
-        text-decoration: overline;
-    }
-</style>
-{% if messages %}
-    {% for msg in messages %}
-        <div class="alert alert-{% if msg.tags == "error" %}danger{% else %}success{% endif %} d-flex flex-row" role="alert">
-            <div class="flex-grow-1">{{ msg }}</div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endfor %}
-{% endif %}
+    <style>
+        #title_time {
+            font-size: 10vw;
+            font-weight: bold;
+            user-select: none;
+            text-decoration: overline;
+        }
+    </style>
+
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-{% if msg.tags == "error" %}danger{% else %}success{% endif %} d-flex flex-row" role="alert">
+                <div class="flex-grow-1"> {{ msg }} </div>
+                <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
     {% if currUser.is_authenticated %}
         <center>
             <h1 id="title_time" class="mb-5 mt-3 link-offset-2"><u><span class="text-danger">1</span>ssueTrak</u></h1>
             <i>Assisting fellow housemates</i>
-
         </center>
     {% else %}
-        <span class="text-warning">You are not logged in!</span> Some options will be disabled. 
+        <span class="text-warning">You are not logged in!</span> Some options will be disabled.
         <p>Please <a href={% url "login" %}>log in</a> to use the application.</p>
     {% endif %}
 
 {% endblock main %}
-{% block title %}{{ title }}{% endblock title %}

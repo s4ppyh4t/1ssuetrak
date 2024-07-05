@@ -1,0 +1,31 @@
+<div id="solve_section" class="card mb-3">
+    <div class="card-header">
+        <h5>Solve this issue?</h5>
+    </div>
+    <div class="card-body">
+        <div class="overflow-auto" style="max-height:20em">
+            
+        </div>
+        <form hx-swap="outerHTML transition:true" hx-target="main" hx-select="main" hx-post="{% url 'issues:solve_issue' issue.pk%}">
+            {% csrf_token %}
+            <p>How much did it cost you to solve this issue?</p>
+            <center class="mb-2">
+                <div class="input-group mb-3" style=" width: 40%;">
+                    <span class="input-group-text fs-1">$</span>
+                    <input {% if issue_status %}disabled{% endif %} type="number" 
+                       class="form-control text-center fs-1" 
+                       step="0.01"
+                       placeholder="0.0"
+                       value="0.0"
+                       aria-label="Dollar amount (with dot and two decimal places)"
+                       name="i_cost">
+                </div>
+            </center>
+            <div class="btn-group w-100 mb-2">
+                <button style="flex-grow: 1;" type="reset" class="btn btn-secondary">Reset</button>
+                <button {% if issue_status %}disabled{% endif %} style="flex-grow: 3;" type="submit" class="btn btn-success">Solve!</button>
+            </div>
+        </form>
+
+    </div>
+</div>

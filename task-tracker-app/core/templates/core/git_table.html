@@ -1,41 +1,41 @@
 {% extends "core/base.html" %}
 {% block title %}GitHub Commits History{% endblock title %}
 {% block main %}
-<div class="container">
-    <h3 class="pico-color-pink-500">Git Commits</h3>
+    <div class="container">
+        <h3 class="pico-color-pink-500">Git Commits</h3>
 
-</div>
-<div class="container accordion" id="git-accordion">
-    {% for group in data %}
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" 
-                        type="button" 
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#collapse{{ forloop.counter }}" 
-                        aria-expanded="true" 
-                        aria-controls="collapse{{ forloop.counter }}"
-                >
-                    <b>{{ group.0 }}</b>~<sub>commits</sub></h2>
+    </div>
+    <div class="container accordion" id="git-accordion">
+        {% for group in data %}
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse{{ forloop.counter }}"
+                            aria-expanded="true"
+                            aria-controls="collapse{{ forloop.counter }}"
+                    >
+                        <b>{{ group.0 }}</b>~<sub>commits</sub></h2>
                 </button>
-            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#git-accordion">
-                <div class="accordion-body">
-                    <ul>
-                        {% for rec in group.1 %}
-                            <li>
-                                <p>
-                                    <a href={{ rec.commit_url }}><i>@{{rec.commit_datetime}}</i></a>
-                                    <sub><i>by {{ rec.commit_committer }}</i></sub> - 
-                                    <ins>{{ rec.commit_comment }} </ins>
-                                <p> 
-                            </li>
-                        {% endfor %}
-                    </ul>
+                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#git-accordion">
+                    <div class="accordion-body">
+                        <ul>
+                            {% for rec in group.1 %}
+                                <li>
+                                    <p>
+                                        <a href={{ rec.commit_url }}><i>@{{rec.commit_datetime}}</i></a>
+                                        <sub><i>by {{ rec.commit_committer }}</i></sub> -
+                                        <ins>{{ rec.commit_comment }} </ins>
+                                        <p>
+                                        </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
 
 
 {% comment %} <section class="overflow-auto" data-class="" style="height: 80vh;">

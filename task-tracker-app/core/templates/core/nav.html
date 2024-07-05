@@ -1,61 +1,61 @@
 {% with is_auth=request.user.is_authenticated %}
-<style>
-    .navbar {
-        background-image: linear-gradient(to right, #0d6efd80 0%, #0d6efd50 40%, #0d6efd10 100%);
-        z-index: 1040;
-      }
-</style>
-<nav class="navbar bg-body-tertiary navbar-expand-md sticky-top">
-    <div class="container-fluid">
-        {% load static %}
-        <a 
-        href="{% url "core:index" %}"
-        class="nav-item navbar-brand link-offset-2" 
-        style=""><img src="{% static "favicon.ico" %}" alt="logo" height="40px"></a>
-        
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapse" aria-controls="navCollapse" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navCollapse">
-            <ul class="navbar-nav nav-underline me-auto my-2 my-lg-0 text-center" style="--bs-scroll-height: 120px; user-select: none;">            
-                <li class="nav-item">
-                    <a class="nav-link" href={% url "core:index" %}>Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href= {% url "issues:index" %} >Issue Board</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href= {% url "core:git_table" %} >GitHub Commits</a>
-                </li>
-            </ul>
-            <div class="d-flex justify-content-between" role="authenticate" style="gap: 20px;">
-                {% if request.user.is_authenticated %}
-                    {% if request.user.is_staff == 1 %}
-                        <a class="auth-btn btn btn-success flex-grow-1" href={% url "admin:index" %}>[{{ request.user.username }}]</a>
+    <style>
+        .navbar {
+            background-image: linear-gradient(to right, #0d6efd80 0%, #0d6efd50 40%, #0d6efd10 100%);
+            z-index: 1040;
+        }
+    </style>
+    <nav class="navbar bg-body-tertiary navbar-expand-md sticky-top">
+        <div class="container">
+            {% load static %}
+            <a
+                href="{% url "core:index" %}"
+                class="nav-item navbar-brand link-offset-2"
+                style=""><img src="{% static "favicon.ico" %}" alt="logo" height="35px"></a>
+
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapse" aria-controls="navCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navCollapse">
+                <ul class="navbar-nav nav-underline my-2 my-md-0 text-center flex-grow-1" style="--bs-scroll-height: 120px; user-select: none;">
+                    <li class="nav-item">
+                        <a class="nav-link py-0" href={% url "core:index" %}>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link py-0" href= {% url "issues:index" %} >Issue Board</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link py-0" href= {% url "core:git_table" %} >GitHub Commits</a>
+                    </li>
+                </ul>
+                <div class="d-flex justify-content-between" role="authenticate" style="gap: 20px;">
+                    {% if request.user.is_authenticated %}
+                        {% if request.user.is_staff == 1 %}
+                            <a class="auth-btn btn btn-success flex-grow-1" href={% url "admin:index" %}>[{{ request.user.username }}]</a>
+                        {% else %}
+                            <a
+                                class="auth-btn btn btn-secondary flex-grow-1"
+                                hx-get="{% url "issues:user_details" request.user.pk %}"
+                                hx-swap="outerHTML transition:true show:window:top"
+                                hx-target="#main-container"
+                                hx-select="#main-container"
+                                hx-push-url="true"
+                            >
+                                Hi, {{ request.user.username }}!
+                            </a>
+                        {% endif %}
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button class="auth-btn btn btn-outline-danger flex-grow-1" type="submit">Logout</button>
+                        </form>
                     {% else %}
-                        <a 
-                            class="auth-btn btn btn-secondary flex-grow-1" 
-                            hx-get="{% url "issues:user_details" request.user.pk %}" 
-                            hx-swap="outerHTML transition:true show:window:top" 
-                            hx-target="#main-container" 
-                            hx-select="#main-container" 
-                            hx-push-url="true"
-                        >
-                            Hi, {{ request.user.username }}!
-                        </a>
+                        <a class="auth-btn btn btn-primary flex-grow-1" href= "{% url "login" %}">Login</a>
+
+                        <a class="auth-btn btn btn-secondary flex-grow-1" href= "{% url "signup" %}">Signup</a>
                     {% endif %}
-                    <form method="post" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <button class="auth-btn btn btn-outline-danger flex-grow-1" type="submit">Logout</button>
-                    </form>
-                {% else %}
-                    <a class="auth-btn btn btn-primary flex-grow-1" href= "{% url "login" %}">Login</a>
-                    
-                    <a class="auth-btn btn btn-secondary flex-grow-1" href= "{% url "signup" %}">Signup</a>
-                {% endif %}
-            </div>   
+                </div>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 {% endwith %}

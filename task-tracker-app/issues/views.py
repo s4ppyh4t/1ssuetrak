@@ -25,6 +25,7 @@ from .scripts.data_gen import IssueFactory
 from .forms import issueCreateOrUpdateForm
 from .forms import issueSortForm
 from .forms import issueCommentForm
+from .forms import IssueRecForm
 
 
 #! >>> Base list view with pagination for issues:index <<< DONE
@@ -46,10 +47,9 @@ class IssueListView(ListView):
         return context
 
     def get_queryset(self):
-        query = Issue.objects.prefetch_related(Prefetch("o_uid", queryset=IssueOwner.objects.select_related("user"))).order_by(f"-{self.date_field}")
-
+        query = Issue.objects.prefetch_related(Prefetch("o_uid", queryset=IssueOwner.objects.select_related("user"))).order_by("i_status",f"-{self.date_field}")
         if self.sort_option:
-            query = query.order_by(self.sort_option)
+            query = query.order_by("-i_status", self.sort_option)
 
         if (self.filter_text is None) or (self.filter_text == ""):
             return query
@@ -223,6 +223,45 @@ def get_issue_details(request, i_pk):
     }
     return render(request, "issues/issue_detail.html", context=context)
 
+#! >>> Call for solving the issue (form was included within the issue details template)
+def solve_issue(request, i_pk):
+    issue_obj = Issue.objects.get(pk=i_pk)
+    if request.method != "POST":
+        error(request, "Please use POST")
+        return redirect(reverse("issues:issue_details", args=[i_pk]))
+    
+    if issue_obj.i_status:
+        error(request, "Issue has already been solved")
+        return redirect(reverse("issues:issue_details", args=[i_pk]))
+
+    payload: QueryDict = request.POST.copy()
+    payload.appendlist("s_uid", request.user)
+    payload.appendlist("i_id", i_pk)
+
+    form = IssueRecForm(payload)
+    if not form.is_valid():
+        error(request, form.errors)
+    else:
+        try:
+            with transaction.atomic():
+                solved_issue = form.save()
+                issue_obj.i_status = True
+                issue_obj.save()
+            success(
+                request,
+                message=f"Issue #{ i_pk } has been solved @ { solved_issue.s_date }!",
+            )
+        except DatabaseError as e:
+            error(request, f"Database error! {e}")
+        except Exception as e:
+            error(request, message=f"Something is wrong! {e}")
+    
+    return redirect(reverse("issues:issue_details", args=[i_pk]))
+
+
+
+
+
 """ == ISSUE_OWNER VIEWS & ISSUE_COMMENT VIEWS ==
 - The code below provide user with endpoints to work with the IssueOwner class/table 
 icluding but not limitied to the following operations:
@@ -252,14 +291,16 @@ def owner_details(request, u_pk):
 
     analysis_data = { item['i_date__date'].strftime("%b-%d") : item["i_count"]  for item in list(issueList.filter(i_date__range=( datetime.datetime.today() - datetime.timedelta(days=look_range), datetime.datetime.today())).values("i_date__date").annotate(i_count=Count('pk')).values("i_date__date", "i_count").order_by("i_date__date")) }
     all_dates = [d.strftime("%b-%d") for d in (datetime.date.today() - datetime.timedelta(days=i) for i in range(look_range,-1,-1))]
-    print(analysis_data)
+    solve_data = { item['s_date__date'].strftime("%b-%d") : item["s_count"]  for item in list(issueOwner.issuerec_set.filter(s_date__range=( datetime.datetime.today() - datetime.timedelta(days=look_range), datetime.datetime.today())).values("s_date__date").annotate(s_count=Count('pk')).values("s_date__date", "s_count").order_by("s_date__date")) }
+
     context = {
         "issues": issueList,
         "comments": commentList,
         "user": issueOwner,
         "graph_data": {
             "i_date": all_dates,
-            "i_count": [analysis_data.get(d, 0) for d in all_dates]
+            "i_count": [analysis_data.get(d, 0) for d in all_dates],
+            "s_count": [solve_data.get(d, 0) for d in all_dates],
         }
     }
 
@@ -279,6 +320,8 @@ def create_comment(request, i_pk):
 
     if not cmt_form.is_valid():
         error(request, f"Something went wrong {cmt_form.errors}")
-    cmt_form.save()
+        print(cmt_form.errors)
+    else:
+        cmt_form.save()
     # return render(request, "issues/issue_comment.html")
     return redirect(reverse("issues:issue_details", args=[i_pk]))

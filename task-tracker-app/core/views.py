@@ -57,8 +57,6 @@ def api_createuser(request):
     payload = request.POST.copy()
     if request.method == "POST":
         form = SignupForm(payload)
-        print(payload)
-        print(request.FILES)
         if form.is_valid():
             # Save the user created from the form
             try:

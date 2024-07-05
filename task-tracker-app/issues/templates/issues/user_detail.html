@@ -1,7 +1,12 @@
 {% extends "issues/index.html" %}
 {% block main %}
+<style>
+  #userIssueTable > tbody > .solved-row > td {
+    background-color: #011a0ed0;
+    opacity: 0.5;
+  }
+</style>
 <div id="main-container" class="container mt-3">
-  
   <div class="row d-flex mb-3 h-100">
     <div class="col-12 col-md-4 mb-3">
       <div class="card h-100">
@@ -36,28 +41,28 @@
               <label>Issues owned/solved status</label>
               <div class="progress-stacked h-auto">
                 <div class="progress" role="progressbar" aria-label="Issue made" aria-valuenow="{{ user_insight.total_issue }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ user_insight.unsolve_ratio }}%; height: 3em;">
-                  <div class="progress-bar bg-secondary">Made {{ user_insight.total_issue }} issues</div>
+                  <div title="Made {{ user_insight.total_issue }} issues" class="progress-bar bg-secondary">Made {{ user_insight.total_issue }} issues</div>
                 </div>
                 <div class="progress" role="progressbar" aria-label="Issue solved" aria-valuenow="{{ user_insight.issue_solved }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ user_insight.solve_ratio }}%; height: 3em;">
-                  <div class="progress-bar">Solved {{ user_insight.issue_solved }} issues</div>
+                  <div title="Solved {{ user_insight.issue_solved }} issues" class="progress-bar">Solved {{ user_insight.issue_solved }} issues</div>
                 </div>
               </div>
               {% endwith %}
             </div>
-            <div class="mb-4">
-              <label>Participative Solvency (PS) earned this month</label>
+            <div class="mb-2">
+              <label class="mb-1">Activity in the last 21 days</label>
+              <div class="chart-container" style="position: relative; height: 8.5em">
+                <canvas id="myChart"></canvas>
+              </div>
+            </div> 
+          </div>
+          <div class="">
+            <label>Participation Solvency (PS) available this month</label>
               {% with user_pts=user.pts %}
               <div class="progress" role="progressbar" aria-label="PS earned month" aria-valuenow="{{ user_pts }}" aria-valuemin="0" aria-valuemax="100" style="height: 3em;">
                 <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: {{ user_pts }}%">{{ user_pts }} ps</div>
               </div>
               {% endwith %}
-            </div> 
-          </div>
-          <div class="row">
-            <label class="mb-1">Activity in the last 21 days</label>
-            <div class="chart-container" style="position: relative; height: 8.5em">
-              <canvas id="myChart"></canvas>
-            </div>
           </div>
         </div>
       </div>
@@ -82,21 +87,24 @@
             </thead>
             <tbody id="userIssueTableBody">
               {% for issue in issues %}
-                <tr 
+                {% with issue_status=issue.i_status %}
+                <tr
                   hx-get="{% url "issues:issue_details" issue.pk %}" 
                   hx-swap="outerHTML transition:true show:window:top" 
                   hx-target="main"
                   hx-select="main"
                   hx-push-url="true"
+                  {% if issue_status %}class="solved-row"{% endif %}
                 >
-                  <th scope="row">{{ issue.pk }}</th>
+                  <td>{{ issue.pk }}</td>
                   <td>{{ issue.i_name }}</td>
-                  <td><span class="badge bg-danger flex-grow-1">{{ issue.get_ugc_rating_display }}</span></td>
-                  <td><span class="badge bg-primary flex-grow-1">{{ issue.get_dif_rating_display }}</span></td>
+                  <td><span class="badge bg-danger">{{ issue.get_ugc_rating_display }}</span></td>
+                  <td><span class="badge bg-primary">{{ issue.get_dif_rating_display }}</span></td>
                   <td>{{ issue.i_date }}</td>
                   <td>{{ issue.d_date }}</td>
                   <td>{{ issue.get_i_status_display }}</td>
                 </tr>
+                {% endwith %}
               {% endfor %}
             </tbody>
           </table>
@@ -145,13 +153,20 @@
     // Chart data object with multiple datasets (optional for stacking)
     var chartData = {
       labels: {{ graph_data.i_date | safe }},
-      datasets: [{
-        label: 'Issues made',
-        data: {{ graph_data.i_count | safe }},
-        backgroundColor: '#0d6efd50',
-        borderColor: '#0d6efd',
-        borderWidth: 1
-      }]
+      datasets: [
+        {
+          label: 'Issues made',
+          data: {{ graph_data.i_count | safe }},
+          backgroundColor: '#95989a50',
+          borderWidth: 1
+        },
+        {
+          label: 'Issues solved',
+          data: {{ graph_data.s_count | safe }},
+          backgroundColor: '#0d6efdd0',
+          borderWidth: 1
+        }
+      ]
     };
     
     // Chart options with adjustments for more data
@@ -161,10 +176,16 @@
       options: {
         responsive: true, 
         maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+        },
         scales: {
+          x: {
+            stacked: true,
+        },
           y: {
-            display: false,
-          }
+            stacked: true
+        }
         },
         plugins: {
           legend: {
