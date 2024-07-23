@@ -6,11 +6,25 @@
 {% block main %}
     <style>
         #title_time {
+            display:inline-block;
+            will-change: transform;
+            width: auto;
             font-size: 10vw;
             font-weight: bold;
             user-select: none;
-            text-decoration: overline;
+            text-decoration: overline underline;
+            transition: transform 0.05s ease-out;
+            animation: spin 10s infinite;
         }
+
+        #title_time:hover {
+            cursor: pointer;
+        }
+
+        @keyframes spin {
+            from   {transform: scale(1) rotateX(0) rotateY(0);}
+            to  {transform: scale(1) rotateX(0) rotateY(360deg);}
+          }
     </style>
 
     {% if messages %}
@@ -21,15 +35,120 @@
             </div>
         {% endfor %}
     {% endif %}
-    
     {% if currUser.is_authenticated %}
-        <center>
-            <h1 id="title_time" class="mb-5 mt-3 link-offset-2"><u><span class="text-danger">1</span>ssueTrak</u></h1>
+        <center class="">
+            <hr>
+            <h1 class="my-5"><u class="link-offset-2" id="title_time">
+                <span class="text-danger">1</span>ssueTrak</u></h1>
             <i>Assisting fellow housemates</i>
+            <hr>
         </center>
+        <div id="briefCard" class="card mb-3 border-primary">
+            <div class="card-header text-primary"><h3>Brief Description</h3></div>
+            <div class="card-body">
+                <div class="row">
+                    <div id="briefContent" class="col-12" style="text-align:justify">
+                        <p>
+                            This application is a personal project developed to help housemates 
+                            (or people living under the same roof) manage their shared responsibilities, 
+                            finances and (most importantly) 
+                            <strong class="text-danger">1ssues</strong>!
+                        </p>
+                        <p>
+                            1ssues are what we all have to encounter every single day, 
+                            and while it seems like the more the merrier, things can be 
+                            quite messy without proper coordination, 
+                            <em>especially when mutual respect is not given...</em>
+                        </p>
+                    </div>    
+                </div>
+                
+                <p><em>--> thus the birth of this application</em></p>
+            </div>
+        </div>
+        <div id="howtoCard" class="card mb-3 border-info">
+            <div class="card-header text-info">
+                <h3>How to use?</h3>
+            </div>
+            <div class="card-body">
+                <p>1ssuetrak allows users to perform certain tasks to work with shared <strong>Issues</strong>, a central concept of the app. My philosophy of house-sharing management is as followed:</p>
+                <blockquote>
+                    <p><em>"If an individual in a group encountered a hardship or is in need of solving a problem, or just simply wish to receive a favor from others, they are having a shared <code>Issue</code>. As a group, we work towards solving such issue, then be compensated by returned favors, and not by other means."</em></p>
+                </blockquote>
+                <center>
+                    {% include "issues/howto.html" %}
+                </center>
+            </div>
+        </div>
+        <div id="noticeCard" class="card mb-3" >
+            <div class="card-header"></div>
+            <div class="card-body"></div>
+        </div>
     {% else %}
         <span class="text-warning">You are not logged in!</span> Some options will be disabled.
         <p>Please <a href={% url "login" %}>log in</a> to use the application.</p>
     {% endif %}
 
+
+<script>
+        /* Store the element in el */
+    let el = document.getElementById('title_time')
+    
+    /* Get the height and width of the element */
+    const height = el.clientHeight
+    const width = el.clientWidth
+    
+    /*
+      * Add a listener for mousemove event
+      * Which will trigger function 'handleMove'
+      * On mousemove
+      */
+    el.addEventListener('mousemove', handleMove)
+    
+    /* Define function a */
+    function handleMove(e) {
+      /*
+        * Get position of mouse cursor
+        * With respect to the element
+        * On mouseover
+        */
+      /* Store the x position */
+      const xVal = e.layerX
+      /* Store the y position */
+      const yVal = e.layerY
+      
+      /*
+        * Calculate rotation valuee along the Y-axis
+        * Here the multiplier 20 is to
+        * Control the rotation
+        * You can change the value and see the results
+        */
+      const yRotation = 20 * ((xVal - width / 2) / width)
+      
+      /* Calculate the rotation along the X-axis */
+      const xRotation = -20 * ((yVal - height / 2) / height)
+      
+      /* Generate string for CSS transform property */
+      const string = 'perspective(500px) scale(1) rotateX(' + xRotation + 'deg) rotateY(' + yRotation + 'deg)'
+      
+      /* Apply the calculated transformation */
+      el.style.transform = string
+    }
+    
+    /* Add listener for mouseout event, remove the rotation */
+    el.addEventListener('mouseout', function() {
+      el.style.transform = 'perspective(1500px) scale(1) rotateX(0) rotateY(0)'
+    })
+    
+    /* Add listener for mousedown event, to simulate click */
+    el.addEventListener('mousedown', function() {
+      el.style.transform = 'perspective(1500px) scale(0.9) rotateX(0) rotateY(0)'
+    })
+    
+    /* Add listener for mouseup, simulate release of mouse click */
+    el.addEventListener('mouseup', function() {
+      el.style.transform = 'perspective(1500px) scale(1) rotateX(0) rotateY(0)'
+    })
+</script>
 {% endblock main %}
+

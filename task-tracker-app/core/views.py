@@ -24,6 +24,13 @@ def index(request):
 
 
 def git_tab(request):
+    return render(
+        request,
+        "core/git_table.html",
+        {},
+    )
+
+def git_retrieve(request):
     app_name = "1ssuetrak"
     data: Result[dict, str] = scrape_commits(
         url=f"https://api.github.com/repos/s4ppyh4t/{app_name}/commits"
@@ -34,10 +41,9 @@ def git_tab(request):
 
     return render(
         request,
-        "core/git_table.html",
+        "core/git_history.html",
         {
             "data": list(payload.items()),
-            "currUser": request.user,
         },
     )
 

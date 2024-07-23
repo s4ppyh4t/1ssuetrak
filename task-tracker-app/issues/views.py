@@ -130,6 +130,8 @@ def create_issue(request):
         error("Incorrect method used! Please use POST method to create issues.")
         return redirect(reverse("issues:index"))
 
+    i_owner = IssueOwner.objects.get(pk=request.user.id)
+
     # * Update and Clean input data from form for Form validation
     payload = request.POST.copy()
     payload.update(
@@ -141,7 +143,7 @@ def create_issue(request):
                 if payload.get("d_date")
                 else None
             ),
-            "o_uid": IssueOwner.objects.get(pk=request.user.id),
+            "o_uid": i_owner,
         }
     )
 
@@ -160,6 +162,8 @@ def create_issue(request):
     try:
         with transaction.atomic():
             new_issue = new_issue_form.save()
+            i_owner.pts -= new_issue.ugc_rating * new_issue.dif_rating
+            i_owner.save()
         success(
             request,
             message=f"Issue #{ new_issue.pk } has been successfully {'updated' if issue_instance else 'created'}!",
@@ -197,6 +201,10 @@ def delete_issue(request):
             return redirect(reverse("issues:index"))
         with transaction.atomic():
             target_issue.delete()
+            user: IssueOwner = target_issue.o_uid
+            user.pts += target_issue.ugc_rating * target_issue.dif_rating
+            user.save()
+
         success(request, f"Issue #{payload.get('i_pk')} successfully deleted")
     except (DatabaseError, Http404) as e:
         error(request, f"Something went wrong: {e}")

@@ -1,0 +1,95 @@
+<div class="w-100" style="max-width: 690px; text-align: justify;">
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4>1. Become an <code>IssueOwner</code></h4>
+        </div>
+        <div class="card-body">
+            Sign up or log in to get access to the Issue Board.
+            Each owner possesses a <code>Participation Solvency</code> metric, or <b>PS</b>,
+            describing how active they are in the matter of solving other owners' solutions.
+            <br><br>
+            Each owner has a specific PS default that refreshes every month. This metric <u>does not have a cap</u>, but can turn negative if one owe too many <code>Issue</code> in a month.
+            Creating <code>Issue</code> will cost you PS, but solving them will earn you more!
+        </div>
+    </div>
+    <center class="mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1"/>
+        </svg>
+    </center>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4>2. Create your <code>Issue</code></h4>
+        </div>
+        <div class="card-body">
+            Create your own issues after logging in at the Issue Board.
+            In addition to <code>Issue</code>'s name, description and deadline date,
+            a particular <code>Issue</code> will also have <code>UGC_Rating</code> (Urgency rating) 
+            & <code>DIF_Rating</code> (Difficulty rating) that dictates its <code>Participation Solvency</code> cost when an <code>IssueOwner</code> attempt to create it.
+            <br><br>
+            This value is calculated by the following formula:<br><br>
+            <center><code>PS Cost = UGC_Rating * DIF_Rating</code></center>
+            <br><br>
+            Each classification will have their own values, as per the following look-up table
+
+            <table class="table">
+                <thead>
+                    <th>UGC</th>
+                    <th>DIF</th>
+                    <th>Value</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-danger">Misc</span></td>
+                        <td><span class="badge bg-primary">Very Easy</span></td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-danger">Non-urgent</span></td>
+                        <td><span class="badge bg-primary">Easy</span></td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-danger">Essential</span></td>
+                        <td><span class="badge bg-primary">Medium</span></td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-danger">Urgent</span></td>
+                        <td><span class="badge bg-primary">Hard</span></td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-danger">Very Hard</span></td>
+                        <td><span class="badge bg-primary">Very Urgent</span></td>
+                        <td>5</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <center class="mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1"/>
+        </svg>
+    </center>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4>3. Solve <code>Issue</code> & the <code>PS</code> system</h4>
+        </div>
+        <div class="card-body">
+            <p>
+                Without solving issues, owners will not regain any <code>PS</code>. The system incentivises
+                harmonic distribution between declaring and solving <code>Issue</code> amongst the community, as well as "second-chances",
+                which is why the value refreshes every month and only punish owners on owed amounts. 
+                <br><br>
+                <i>In a perfect world, each <code>IssueOwner</code> should have 100 <code>PS</code> or more by the end of month.</i>
+            </p>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4>3. Solve <code>Issue</code> & the <code>PS</code> system</h4>
+        </div>
+    </div>
+</div>

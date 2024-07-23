@@ -36,11 +36,7 @@
                         {% else %}
                             <a
                                 class="auth-btn btn btn-secondary flex-grow-1"
-                                hx-get="{% url "issues:user_details" request.user.pk %}"
-                                hx-swap="outerHTML transition:true show:window:top"
-                                hx-target="#main-container"
-                                hx-select="#main-container"
-                                hx-push-url="true"
+                                href="{% url "issues:user_details" request.user.pk %}"
                             >
                                 Hi, {{ request.user.username }}!
                             </a>

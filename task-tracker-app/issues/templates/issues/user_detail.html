@@ -68,83 +68,87 @@
       </div>
     </div>
   </div>
-  <div class="row d-flex ">
-    <div class="col-md-12">  
-      <div class="row">
-        <h4>Issues owned by this user</h4>
-        <div class="overflow-auto" style="max-height: 20em;">
-          <table id="userIssueTable" class="table table-striped table-hover" style="user-select: none">
-            <thead id="userIssueTableHead" class="sticky-top">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">UGC</th>
-                <th scope="col">DIF</th>
-                <th scope="col">Issue date</th>
-                <th scope="col">Due date</th>
-                <th scope="col">Status</th>
-              </tr>
-            </thead>
-            <tbody id="userIssueTableBody">
-              {% for issue in issues %}
-                {% with issue_status=issue.i_status %}
-                <tr
-                  hx-get="{% url "issues:issue_details" issue.pk %}" 
-                  hx-swap="outerHTML transition:true show:window:top" 
-                  hx-target="main"
-                  hx-select="main"
-                  hx-push-url="true"
-                  {% if issue_status %}class="solved-row"{% endif %}
-                >
-                  <td>{{ issue.pk }}</td>
-                  <td>{{ issue.i_name }}</td>
-                  <td><span class="badge bg-danger">{{ issue.get_ugc_rating_display }}</span></td>
-                  <td><span class="badge bg-primary">{{ issue.get_dif_rating_display }}</span></td>
-                  <td>{{ issue.i_date }}</td>
-                  <td>{{ issue.d_date }}</td>
-                  <td>{{ issue.get_i_status_display }}</td>
-                </tr>
-                {% endwith %}
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="alert alert-info d-flex align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+        </svg>
+        <div>&nbsp;Owners' PS will be refreshed to <b>100 points</b> on the 1st of every month. Previous month's owed PS will be deducted from this amount.</div>
       </div>
-      <br/>
-      <hr/>
-      <br/>
-      <div class="row">
-        <h4>Comments made by this user</h4>
-        <div class="overflow-auto" style="max-height: 20em;">
-          <table id="userIssueTable" class="table table-striped table-hover" style="user-select: none">
-            <thead id="userIssueTableHead" class="sticky-top">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">on Issue</th>
-                <th scope="col">Comment content</th>
-                <th scope="col">Comment date</th>
-              </tr>
-            </thead>
-            <tbody id="userIssueTableBody">
-              {% for comment in comments %}
-                <tr 
-                  hx-get="{% url "issues:issue_details" comment.issue.pk %}" 
-                  hx-swap="outerHTML transition:true show:window:top" 
-                  hx-target="main"
-                  hx-select="main"
-                  hx-push-url="true"
-                >
-                  <th scope="row">{{ comment.pk }}</th>
-                  <td><span class="">#{{ comment.issue.pk }}</span></td>
-                  <td><span class="">{{ comment.c_cont }}</span></td>
-                  <td>{{ comment.c_date }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-  </div>  
+    </div>
+  </div>
+  <div class="row">
+    <h4>Issues owned by this user</h4>
+    <div class="overflow-auto" style="max-height: 20em;">
+      <table id="userIssueTable" class="table table-striped table-hover" style="user-select: none">
+        <thead id="userIssueTableHead" class="sticky-top">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">UGC</th>
+            <th scope="col">DIF</th>
+            <th scope="col">Issue date</th>
+            <th scope="col">Due date</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody id="userIssueTableBody">
+          {% for issue in issues %}
+            {% with issue_status=issue.i_status %}
+            <tr
+              hx-get="{% url "issues:issue_details" issue.pk %}" 
+              hx-swap="outerHTML transition:true show:window:top" 
+              hx-target="main"
+              hx-select="main"
+              hx-push-url="true"
+              {% if issue_status %}class="solved-row"{% endif %}
+            >
+              <td>{{ issue.pk }}</td>
+              <td>{{ issue.i_name }}</td>
+              <td><span class="badge bg-danger">{{ issue.get_ugc_rating_display }}</span></td>
+              <td><span class="badge bg-primary">{{ issue.get_dif_rating_display }}</span></td>
+              <td>{{ issue.i_date }}</td>
+              <td>{{ issue.d_date }}</td>
+              <td>{{ issue.get_i_status_display }}</td>
+            </tr>
+            {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <br/>
+  <div class="row">
+    <h4>Comments made by this user</h4>
+    <div class="overflow-auto" style="max-height: 20em;">
+      <table id="userIssueTable" class="table table-striped table-hover" style="user-select: none">
+        <thead id="userIssueTableHead" class="sticky-top">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">on Issue</th>
+            <th scope="col">Comment content</th>
+            <th scope="col">Comment date</th>
+          </tr>
+        </thead>
+        <tbody id="userIssueTableBody">
+          {% for comment in comments %}
+            <tr 
+              hx-get="{% url "issues:issue_details" comment.issue.pk %}" 
+              hx-swap="outerHTML transition:true show:window:top" 
+              hx-target="main"
+              hx-select="main"
+              hx-push-url="true"
+            >
+              <th scope="row">{{ comment.pk }}</th>
+              <td><span class="">#{{ comment.issue.pk }}</span></td>
+              <td><span class="">{{ comment.c_cont }}</span></td>
+              <td>{{ comment.c_date }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
   <script>
     var ctx = document.getElementById('myChart').getContext('2d');

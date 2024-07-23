@@ -73,19 +73,8 @@
             {% block main %}{% endblock main %}
         </main>
         <hr/>
-        <footer>
-            {% include "core/footer.html" %}
-        </footer>
+        
+        {% include "core/footer.html" %}
         {% block extra_script %}{% endblock extra_script %}
     </body>
-    <script>
-        document.getElementById('btnModeSwitch').addEventListener('click',()=>{
-            if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
-                document.documentElement.setAttribute('data-bs-theme','light')
-            }
-            else {
-                document.documentElement.setAttribute('data-bs-theme','dark')
-            }
-        })
-    </script>
 </html>
