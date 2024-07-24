@@ -26,6 +26,11 @@ class Issue(models.Model):
         HARD = 4
         VERY_HARD = 5
 
+    class Solve_Status(models.IntegerChoices):
+        NOT_SOLVED = 0
+        PENDING = 1
+        SOLVED = 2
+
     i_name = models.CharField(max_length=50, default="New Issue")
     i_desc = models.CharField(max_length=512, default="No desc", blank=True)
     ugc_rating = models.IntegerField(
@@ -36,13 +41,12 @@ class Issue(models.Model):
     )
     i_date = models.DateTimeField(verbose_name="issue_date", default=timezone.now)
     d_date = models.DateTimeField(verbose_name="deadline", blank=True, null=True)
-    o_uid = models.ForeignKey(
-        to="IssueOwner", on_delete=models.PROTECT, default=2
+    i_owners = models.ManyToManyField(
+        to="IssueOwner", on_delete=models.PROTECT
     )
-    i_status = models.BooleanField(
-        default=False,
-        choices=((False, "Not solved"), (True, "Solved")),
-        verbose_name="Solve status",
+    i_status = models.IntegerField(
+        default=Solve_Status.NOT_SOLVED,
+        choices=Solve_Status.choices
     )
 
     class Meta:
@@ -63,17 +67,20 @@ class Issue(models.Model):
 
 class IssueRec(models.Model):
     i_id = models.ForeignKey(to="Issue", on_delete=models.PROTECT, default=2)
-    s_uid = models.ForeignKey(
+    s_uid = models.ManyToManyField(
         to="IssueOwner",
         on_delete=models.SET_NULL,
         null=True,
-        default=2,
     )
     i_cost = models.FloatField(max_length=50, verbose_name="issue_cost", default=0.0)
     s_date = models.DateTimeField(verbose_name="solved_date", default=timezone.now)
+    i_verified = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Issue {self.i_id} resolved by {self.s_uid}"
+    
+    def get_verification(self):
+        pass
 
 
 class IssueOwner(models.Model):

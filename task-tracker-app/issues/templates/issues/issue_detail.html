@@ -26,7 +26,7 @@
                         hx-get="{% url "issues:user_details" issue.o_uid.pk %}" hx-swap="outerHTML transition:true show:window:top" hx-select="main" hx-target="main" hx-push-url="true"
                     >Back to Owner: {{ issue.o_uid.user.username }}</button>
                 </div>
-                <div class="row">
+                <div class="row" {% if not ownership %}style="display: none"{% endif %}>
                     <div class="col-12">
                       <div class="alert alert-secondary d-flex align-items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
